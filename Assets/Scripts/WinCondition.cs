@@ -5,17 +5,10 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "WinCondition", menuName = "ScriptableObjects/WinCondition", order = 1)]
 public class WinCondition : ScriptableObject
 {
-    public enum WinConditionType
-    {
-        All,
-        Some,
-        None
-    }
-    public string roleName = "";
 
-    public enum WinConditionEffect
-    {
-        Alive,
-        Dead
-    }
+    public bool not = false;
+    public string roleName = "";
+    public WinConditionType winConditionType = WinConditionType.All;
+    public int quantity = 0;
+    public WinConditionStatus winConditionStatus = WinConditionStatus.Dead;
 }

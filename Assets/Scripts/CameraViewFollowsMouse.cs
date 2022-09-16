@@ -19,7 +19,7 @@ public class CameraViewFollowsMouse : MonoBehaviour
     private float pitch = 0.0f;
 
     void Start() {
-       Cursor.visible = false;
+    //    Cursor.visible = false;
     }
 
     void Update () {
