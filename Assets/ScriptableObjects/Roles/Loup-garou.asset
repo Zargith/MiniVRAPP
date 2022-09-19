@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _name: loup-garou
   description: 
-  quantity: 1
+  quantity: 2
   passiveAbilities: []
   activeAbilities: []
   nightAbilities: []

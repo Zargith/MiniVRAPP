@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9fd3406e7b6c7b14883ae3579daf90c4, type: 3}
-  m_Name: WC Loup-garous
+  m_Name: WC Loups-garou
   m_EditorClassIdentifier: 
   not: 1
   roleName: loup-garou

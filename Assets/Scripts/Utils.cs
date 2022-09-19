@@ -15,3 +15,14 @@ public enum WinConditionStatus
     Alive,
     Dead
 }
+
+public enum GameCycle
+{
+    SetDay,
+    DeadsAnnouncement,
+    VillagersVote,
+    // EndVillageVote,
+    SetNight,
+    WerewolvesVote,
+    // EndWerewolvesVote
+}

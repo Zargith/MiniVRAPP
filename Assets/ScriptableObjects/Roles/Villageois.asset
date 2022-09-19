@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _name: villageois(e)
   description: 
-  quantity: 1
+  quantity: 6
   passiveAbilities: []
   activeAbilities: []
   nightAbilities: []

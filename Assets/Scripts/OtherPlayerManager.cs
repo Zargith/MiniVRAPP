@@ -1,17 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using TMPro;
 
-public class PlayerManager : MonoBehaviour
+public class OtherPlayerManager : MonoBehaviour
 {
-    [SerializeField] TextMeshProUGUI roleText;
     Role _role;
 
     public void SetRole(Role role)
     {
         this._role = role;
-        roleText.text = "Ton rôle : " + role._name;
     }
 
     public Role GetRole()
