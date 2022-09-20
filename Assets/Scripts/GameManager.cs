@@ -67,8 +67,7 @@ public class GameManager : MonoBehaviour
 
     void assignRoles()
     {
-        System.Random rand = new System.Random();
-        int rInt = rand.Next(0, roles.Count);
+        int rInt = Random.Range(0, roles.Count);
         playerManager.SetRole(_availableRoles[rInt]);
         _playerIsWereWolf = _availableRoles[rInt]._name == "loup-garou";
         if (!_playerIsWereWolf)
@@ -79,8 +78,7 @@ public class GameManager : MonoBehaviour
             _availableRoles.RemoveAt(rInt);
 
         for (int i = 0; i < otherPlayers.Count; i++) {
-            rand = new System.Random();
-            rInt = rand.Next(0, _availableRoles.Count);
+            rInt = Random.Range(0, _availableRoles.Count);
             otherPlayers[i].GetComponent<OtherPlayerManager>().SetRole(_availableRoles[rInt]);
             if (_availableRoles[rInt]._name != "loup-garou")
                 _nonWerewolfPlayers.Add(otherPlayers[i]);
@@ -201,11 +199,8 @@ public class GameManager : MonoBehaviour
     {
         int remainingVotes = _alivePlayers.Count - 1;
         for (int i = 0; i < remainingVotes; i++) {
-            Debug.LogError("====================================");
-            System.Random rand = new System.Random();
-            int rInt = rand.Next(0, _alivePlayers.Count);
-            Debug.LogError($"{i} {_alivePlayers[rInt].name} {remainingVotes}");
-            _alivePlayers[rInt].GetComponent<SelectPlayer>().select();
+            int rInt = Random.Range(0, _alivePlayers.Count);
+           _alivePlayers[rInt].GetComponent<SelectPlayer>().addVote();
         }
     }
 
@@ -215,13 +210,10 @@ public class GameManager : MonoBehaviour
         if (_playerIsWereWolf)
             remainingVotes--;
 
-        // for (int i = 0; i < remainingVotes; i++) {
-            // Debug.LogError("====================================");
-            System.Random rand = new System.Random();
-            int rInt = rand.Next(0, _nonWerewolfPlayers.Count);
-            // Debug.LogError($"{i} {_nonWerewolfPlayers[rInt].name} {remainingVotes}");
-            _nonWerewolfPlayers[rInt].GetComponent<SelectPlayer>().select();
-        // }
+        for (int i = 0; i < remainingVotes; ++i) {
+            int rInt = Random.Range(0, _nonWerewolfPlayers.Count);
+            _nonWerewolfPlayers[rInt].GetComponent<SelectPlayer>().addVote();
+        }
     }
 
     string getEliminatedPlayerName()

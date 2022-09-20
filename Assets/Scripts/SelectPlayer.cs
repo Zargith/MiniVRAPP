@@ -12,8 +12,14 @@ public class SelectPlayer : MonoBehaviour
         GameCycle gameCycle = GameManager.Instance.getGameCycleStep();
         if (gameCycle == GameCycle.VillagersVote)
             GameManager.Instance.finishVillagersVote();
-        else if (gameCycle == GameCycle.WerewolvesVote)
+        else if (gameCycle == GameCycle.WerewolvesVote) {
             GameManager.Instance.finishWerewolvesVote();
+        }
+    }
+
+    public void addVote()
+    {
+        nbOfSelection++;
     }
 
     public int get()
