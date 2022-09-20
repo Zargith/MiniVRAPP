@@ -3,25 +3,20 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
-public class PlayerManager : MonoBehaviour
+public class PlayerManager : InterfacePlayerManager
 {
     [SerializeField] TextMeshProUGUI roleText;
-    Role _role;
+    [SerializeField] GameObject youDiedPanel;
 
-    public void SetRole(Role role)
+    public override void SetRole(Role role)
     {
-        this._role = role;
+        base.SetRole(role);
         roleText.text = "Ton rôle : " + role._name;
     }
 
-    public Role GetRole()
+    public override void Die()
     {
-        return _role;
-    }
-
-    public void Die()
-    {
-        
+        youDiedPanel.SetActive(true);
     }
 
 }

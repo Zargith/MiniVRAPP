@@ -21,8 +21,6 @@ public enum GameCycle
     SetDay,
     DeadsAnnouncement,
     VillagersVote,
-    // EndVillageVote,
     SetNight,
-    WerewolvesVote,
-    // EndWerewolvesVote
+    WerewolvesVote
 }

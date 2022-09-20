@@ -1,24 +1,21 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
-public class OtherPlayerManager : MonoBehaviour
+public class OtherPlayerManager : InterfacePlayerManager
 {
-    Role _role;
-
-    public void SetRole(Role role)
+    public override void Die()
     {
-        this._role = role;
+        GetComponent<Rigidbody>().isKinematic = false;
+        GetComponent<Animator>().enabled = false;
+        GetComponentInChildren<TextMeshPro>().color = Color.red;
+        StartCoroutine(dieCoroutine());
     }
 
-    public Role GetRole()
+    IEnumerator dieCoroutine()
     {
-        return _role;
+        yield return new WaitForSeconds(3);
+        this.gameObject.SetActive(false);
     }
-
-    public void Die()
-    {
-        
-    }
-
 }
