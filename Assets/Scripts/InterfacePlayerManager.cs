@@ -16,5 +16,5 @@ public abstract class InterfacePlayerManager : MonoBehaviour
         return _role;
     }
 
-    public abstract void Die();
+    public abstract void Die(string reason = "");
 }

@@ -13,11 +13,8 @@ MonoBehaviour:
   m_Name: Loup-garou
   m_EditorClassIdentifier: 
   _name: loup-garou
+  namePlurial: loups-garou
   description: 
   quantity: 2
-  passiveAbilities: []
-  activeAbilities: []
-  nightAbilities: []
-  dayAbilities: []
   winConditions:
   - {fileID: 11400000, guid: 943ef4ae18e0fd3478bf3bf7295938ac, type: 2}

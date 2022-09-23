@@ -16,21 +16,23 @@ public class GameManager : MonoBehaviour
     bool _firstTurn = true;
     bool _waitingEndStep = true;
     bool _playerIsWereWolf = false;
-    string _eatenPlayerName = "";
+    GameObject _eatenPlayer = null;
 
 
     [Header("UI")]
     [SerializeField] GameObject pauseMenu;
+    [SerializeField] GameObject endGameMenu;
+    [SerializeField] TextMeshProUGUI endGameText;
     [SerializeField] GameObject announceGO;
     [SerializeField] TextMeshProUGUI announceText;
     bool _gamePaused = false;
     bool _playerDied = false;
-    float changeTimeSeconds = 2.5f;
-    float startAlpha = 0;
-    float endAlpha = 1;
-    float changeRate = 0;
-    float timeSoFar = 0;
-    bool fading = false;
+    float _changeTimeSeconds = 2.5f;
+    float _startAlpha = 0;
+    float _endAlpha = 1;
+    float _changeRate = 0;
+    float _timeSoFar = 0;
+    bool _fading = false;
 
 
     [Header("Day night cycle")]
@@ -62,7 +64,7 @@ public class GameManager : MonoBehaviour
         _alivePlayers = otherPlayers;
         _alivePlayers.Add(playerManager.gameObject);
         _waitingEndStep = true;
-        StartCoroutine(makeAnnouncement("Les villageois(es) du village de thiercelieux s'endorment paisiblement", true));
+        StartCoroutine(makeAnnouncement("Le village de thiercelieux s'endort paisiblement", true));
     }
 
     void assignRoles()
@@ -98,7 +100,7 @@ public class GameManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Escape))
             changePauseState();
 
-        if (!_waitingEndStep)
+        if (!_waitingEndStep && !_playerDied)
             switch (_gameCycleStep) {
                 case GameCycle.SetDay:
                     _waitingEndStep = true;
@@ -108,29 +110,27 @@ public class GameManager : MonoBehaviour
 
                 case GameCycle.DeadsAnnouncement:
                     _waitingEndStep = true;
-                    // TODO dire qui a été tué et faire une animation de mort (besoin d'une autre step ?)
-                    if (_eatenPlayerName == "Player") {
-                        StartCoroutine(makeAnnouncement($"La nuit dernière vous avez été mangé par les loups-garou"));
-                        playerManager.Die();
+                    if (_eatenPlayer.name == "Player") {
+                        StartCoroutine(makeAnnouncement("La nuit dernière vous avez été dévoré par les loups-garou..."));
+                        playerManager.Die("La nuit dernière vous avez été dévoré par les loups-garou...");
                         _playerDied = true;
                     } else {
-                        // int[] indexToRemove = new int[0];
                         foreach (GameObject player in _alivePlayers)
-                            if (player.name == _eatenPlayerName) {
+                            if (player.name == _eatenPlayer.name) {
                                 player.GetComponent<OtherPlayerManager>().Die();
                                 _alivePlayers.Remove(player);
                                 break;
                             }
-                        StartCoroutine(makeAnnouncement($"La nuit dernière {_eatenPlayerName} a été mangé(e) par les loups-garou\nVous devez maintenant choisir une personne du village à éliminer", true, true));
+                        StartCoroutine(makeAnnouncement($"La nuit dernière {_eatenPlayer.name} a été mangé(e) par les loups-garou\nIl/elle était {_eatenPlayer.GetComponent<OtherPlayerManager>().GetRole()._name}", true, true));
                     }
-                    // TODO vérifier conditions de victoire et de mort du joueur
+                    checkClassVictory();
+                    // TODO vérifier conditions de victoire et de mort du joueur mort
                     break;
 
                 case GameCycle.VillagersVote:
                     _waitingEndStep = true;
                     // TODO ajouter (TODO en VR) le choix de la personne à éliminer
                     StartCoroutine(makeAnnouncement("Veuillez désigner une personne qui selon vous est un loup-garou", false, false, true));
-                    // setVisibleSelectButtons(true);
                     break;
 
                 case GameCycle.SetNight:
@@ -143,12 +143,10 @@ public class GameManager : MonoBehaviour
                     _waitingEndStep = true;
                     // TODO ajouter (TODO en VR) le choix de la personne à éliminer
                     if (_playerIsWereWolf) {
-                        StartCoroutine(makeAnnouncement("Les loups-garous se réveillent pour aller manger un villageois\nQui désignez-vous ?", false, false, true));
-                        // setVisibleSelectButtons(true);
-                    } else {
-                        StartCoroutine(makeAnnouncement("Les loups-garous se réveillent pour aller manger un villageois"));
+                        StartCoroutine(makeAnnouncement("Les loups-garous se réveillent pour aller manger un(e) villageois(e)\nQui désignez-vous ?", false, false, true));
+                        nightPanel.SetActive(false);
+                    } else
                         finishWerewolvesVote();
-                    }
                     break;
             }
     }
@@ -163,26 +161,41 @@ public class GameManager : MonoBehaviour
         setVisibleSelectButtons(false);
 
         assignNPCVotes();
-        _eatenPlayerName = getEliminatedPlayerName();
+        _eatenPlayer = getEliminatedPlayer();
         resetSelectPlayers();
 
-        if (_eatenPlayerName == "Player")
-            StartCoroutine(makeAnnouncement("Les villageois ont voté pour vous éliminer", true, true));
-        else
-            StartCoroutine(makeAnnouncement($"Les villageois ont voté pour éliminer {_eatenPlayerName}", true, true));
-        // TODO vérifier conditions de victoire et de mort du joueur
+        if (_eatenPlayer.name == "Player") {
+            StartCoroutine(makeAnnouncement("Les villageois ont voté pour vous éliminer"));
+            playerManager.Die("Le village à voté contre vous...");
+            _playerDied = true;
+            return;
+        } else {
+            StartCoroutine(makeAnnouncement($"Les villageois ont voté pour éliminer {_eatenPlayer.name}\nIl/elle était {_eatenPlayer.GetComponent<OtherPlayerManager>().GetRole()._name}", true, true));
+            foreach (GameObject player in _alivePlayers)
+                if (player.name == _eatenPlayer.name) {
+                    player.GetComponent<OtherPlayerManager>().Die();
+                    _alivePlayers.Remove(player);
+                    break;
+                }
+        }
+        checkClassVictory();
+        // TODO vérifier conditions de victoire et de mort du joueur mort
     }
 
     public void finishWerewolvesVote()
     {
-        nightPanel.SetActive(true);
         setVisibleSelectButtons(false);
+        nightPanel.SetActive(true);
 
-        assignWerewolfVotes();
-        _eatenPlayerName = getEliminatedPlayerName();
+        if (!_playerIsWereWolf)
+            assignWerewolfVotes();
+        _eatenPlayer = getEliminatedPlayer();
         resetSelectPlayers();
 
-        StartCoroutine(makeAnnouncement("Les loups-garou se rendorment", true, true));
+        if (_playerIsWereWolf)
+            StartCoroutine(makeAnnouncement("Les loups-garou se rendorment", true, true));
+        else
+            StartCoroutine(makeAnnouncement("Les loups-garous se sont réveillés pour dévorer un(e) villageois(e)", true, true));
         nightPanel.SetActive(true);
     }
 
@@ -210,13 +223,33 @@ public class GameManager : MonoBehaviour
         if (_playerIsWereWolf)
             remainingVotes--;
 
-        for (int i = 0; i < remainingVotes; ++i) {
+        for (int i = 0; i < remainingVotes; i++) {
             int rInt = Random.Range(0, _nonWerewolfPlayers.Count);
             _nonWerewolfPlayers[rInt].GetComponent<SelectPlayer>().addVote();
         }
     }
 
-    string getEliminatedPlayerName()
+    void checkClassVictory()
+    {
+        foreach (Role role in roles) {
+            WinCondition[] winConditions = role.winConditions;
+            foreach (WinCondition condition in winConditions) {
+                switch (condition.winConditionType) {
+                    case (WinConditionType.All):
+                        if (condition.winConditionStatus == WinConditionStatus.Dead && getRemainingPlayerWithRole(condition.roleName) == 0) {
+                            StartCoroutine(makeAnnouncement($"Les {role.namePlurial} ont gagné !"));
+                            setEndGame($"Les {role.namePlurial} ont gagné !");
+                        } else if (condition.winConditionStatus == WinConditionStatus.Dead && getRemainingPlayerWithRole("loup-garou") > getRemainingPlayerWithRole("villageois(e)")) {
+                            StartCoroutine(makeAnnouncement($"Les loups-garou ont gagné !"));
+                            setEndGame("Les loups-garou ont gagné !");
+                        }
+                        break;
+                }
+            }
+        }
+    }
+
+    GameObject getEliminatedPlayer()
     {
         GameObject eliminatedPlayer = null;
         foreach (GameObject player in _alivePlayers) {
@@ -225,7 +258,7 @@ public class GameManager : MonoBehaviour
             else if (player.GetComponentInChildren<SelectPlayer>().get() > eliminatedPlayer.GetComponentInChildren<SelectPlayer>().get())
                 eliminatedPlayer = player;
         }
-        return eliminatedPlayer.name;
+        return eliminatedPlayer;
     }
 
     void resetSelectPlayers()
@@ -241,9 +274,20 @@ public class GameManager : MonoBehaviour
     {
         foreach (GameObject player in _alivePlayers) {
             Transform selectPlayerGO = player.transform.Find("Canvas/SelectPlayer");
-            if (selectPlayerGO != null)
-                selectPlayerGO.gameObject.SetActive(visible);
+            if (selectPlayerGO != null) {
+                if (_playerIsWereWolf && player.GetComponent<OtherPlayerManager>().GetRole()._name == "loup-garou")
+                    continue;
+                else
+                    selectPlayerGO.gameObject.SetActive(visible);
+            }
         }
+    }
+
+    void setEndGame(string reason = "")
+    {
+        _playerDied = true;
+        endGameMenu.SetActive(true);
+        endGameText.text = reason + "\n\nPartie terminée, merci d'avoir joué !";
     }
 
 #endregion
@@ -258,10 +302,10 @@ public class GameManager : MonoBehaviour
         for (int i = 0; i < texts.Length; i++) {
             announceText.text = texts[i];
             FadeIn();
-            yield return new WaitForSeconds(5);
+            yield return new WaitForSeconds(3);
         }
         FadeOut();
-        yield return new WaitForSeconds(3);
+        yield return new WaitForSeconds(2.5f);
         announceGO.SetActive(false);
 
         if (_firstTurn && !_playerIsWereWolf) {
@@ -285,34 +329,34 @@ public class GameManager : MonoBehaviour
 
     public void FadeIn()
     {
-        startAlpha = 0;
-        endAlpha = 1;
-        timeSoFar = 0;
-        fading = true;
+        _startAlpha = 0;
+        _endAlpha = 1;
+        _timeSoFar = 0;
+        _fading = true;
         StartCoroutine(FadeCoroutine());
     }
 
     public void FadeOut()
     {
-        startAlpha = 1;
-        endAlpha = 0;
-        timeSoFar = 0;
-        fading = true;
+        _startAlpha = 1;
+        _endAlpha = 0;
+        _timeSoFar = 0;
+        _fading = true;
         StartCoroutine(FadeCoroutine());
     }
 
     IEnumerator FadeCoroutine()
     {
-        changeRate = (endAlpha - startAlpha) / changeTimeSeconds;
-        SetAlpha(startAlpha);
-        while (fading) {
-            timeSoFar += Time.deltaTime;
-            if (timeSoFar > changeTimeSeconds) {
-                fading = false;
-                SetAlpha(endAlpha);
+        _changeRate = (_endAlpha - _startAlpha) / _changeTimeSeconds;
+        SetAlpha(_startAlpha);
+        while (_fading) {
+            _timeSoFar += Time.deltaTime;
+            if (_timeSoFar > _changeTimeSeconds) {
+                _fading = false;
+                SetAlpha(_endAlpha);
                 yield break;
             } else
-                SetAlpha(announceText.color.a + (changeRate * Time.deltaTime));
+                SetAlpha(announceText.color.a + (_changeRate * Time.deltaTime));
 
             yield return null;
         }

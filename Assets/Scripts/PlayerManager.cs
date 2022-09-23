@@ -7,6 +7,7 @@ public class PlayerManager : InterfacePlayerManager
 {
     [SerializeField] TextMeshProUGUI roleText;
     [SerializeField] GameObject youDiedPanel;
+    [SerializeField] TextMeshProUGUI youDiedText;
 
     public override void SetRole(Role role)
     {
@@ -14,9 +15,10 @@ public class PlayerManager : InterfacePlayerManager
         roleText.text = "Ton rôle : " + role._name;
     }
 
-    public override void Die()
+    public override void Die(string reason = "")
     {
         youDiedPanel.SetActive(true);
+        youDiedText.text = reason;
     }
 
 }

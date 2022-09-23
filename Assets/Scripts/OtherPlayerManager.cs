@@ -5,7 +5,7 @@ using TMPro;
 
 public class OtherPlayerManager : InterfacePlayerManager
 {
-    public override void Die()
+    public override void Die(string reason = "")
     {
         GetComponent<Rigidbody>().isKinematic = false;
         GetComponent<Animator>().enabled = false;

@@ -13,11 +13,8 @@ MonoBehaviour:
   m_Name: Villageois
   m_EditorClassIdentifier: 
   _name: villageois(e)
+  namePlurial: villageois(es)
   description: 
   quantity: 6
-  passiveAbilities: []
-  activeAbilities: []
-  nightAbilities: []
-  dayAbilities: []
   winConditions:
   - {fileID: 11400000, guid: ba278753f815f3e4e8cc8956acb96dc1, type: 2}
