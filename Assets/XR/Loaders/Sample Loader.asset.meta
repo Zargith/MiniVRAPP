@@ -1,8 +1,8 @@
 fileFormatVersion: 2
-guid: 130c69c4cc7a3a948810de470c49c71b
-PrefabImporter:
+guid: c3c034fa55769854097a2de1a71cf602
+NativeFormatImporter:
   externalObjects: {}
-  labels: ["oculus_interaction_deprecated"]
+  mainObjectFileID: 11400000
   userData: 
   assetBundleName: 
   assetBundleVariant: 
