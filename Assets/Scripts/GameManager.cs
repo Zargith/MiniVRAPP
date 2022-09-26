@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using TMPro;
 
 public class GameManager : MonoBehaviour
@@ -397,6 +398,12 @@ public class GameManager : MonoBehaviour
         _gamePaused = false;
         Time.timeScale = 1;
         pauseMenu.SetActive(_gamePaused);
+    }
+
+    public void PauseButtonPressed(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+            changePauseState();
     }
 
     public void QuitGame()
