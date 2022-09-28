@@ -7,6 +7,7 @@ public class ReloadActiveScene : MonoBehaviour
 {
     public void ReloadScene()
     {
+        Time.timeScale = 1;
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }

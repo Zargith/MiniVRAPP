@@ -19,7 +19,7 @@
                 {
                     "name": "",
                     "id": "2d6d5911-734d-4745-83e4-655a8024be9e",
-                    "path": "<OculusRemote>/start",
+                    "path": "<XRController>{LeftHand}/menuButton",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
