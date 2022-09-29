@@ -108,7 +108,9 @@ namespace Oculus.Interaction.HandGrab
         protected override void InteractableUnselected(HandGrabUseInteractable interactable)
         {
             base.InteractableUnselected(interactable);
-            StopUsing();
+
+            _currentTarget.Clear();
+            _fingersInUse = HandFingerFlags.None;
         }
 
         private void StartUsing()
@@ -121,12 +123,6 @@ namespace Oculus.Interaction.HandGrab
 
             _currentTarget.Set(SelectedInteractable.transform,
                 HandAlignType.AlignOnGrab, HandGrabTarget.GrabAnchor.Wrist, result);
-        }
-
-        private void StopUsing()
-        {
-            _currentTarget.Clear();
-            _fingersInUse = HandFingerFlags.None;
         }
 
         protected override void DoHoverUpdate()

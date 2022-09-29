@@ -18,7 +18,6 @@
  * limitations under the License.
  */
 
-using System;
 using Facebook.WitAi;
 using Facebook.WitAi.Events;
 using Facebook.WitAi.Lib;
@@ -40,18 +39,28 @@ namespace Oculus.Voice.Bindings.Android
             _bindingEvents = bindingEvents;
         }
 
-        public void onResponse(string response)
+        public void onResponse(string responseJson)
         {
-            var responseNode = WitResponseJson.Parse(response);
-            var transcription = responseNode["text"];
-            VoiceEvents.onFullTranscription?.Invoke(transcription);
-            VoiceEvents.OnResponse?.Invoke(responseNode);
+            WitResponseNode responseNode = WitResponseJson.Parse(responseJson);
+            responseNode.HandleResponse((transcription, final) =>
+            {
+                VoiceEvents.onFullTranscription?.Invoke(transcription);
+            }, (response, final) =>
+            {
+                VoiceEvents.OnResponse?.Invoke(response);
+            });
         }
 
-        public void onPartialResponse(string response)
+        public void onPartialResponse(string responseJson)
         {
-            var responseNode = WitResponseJson.Parse(response);
-            VoiceEvents.onPartialTranscription?.Invoke(responseNode["text"]);
+            WitResponseNode responseNode = WitResponseJson.Parse(responseJson);
+            responseNode.HandleResponse((transcription, final) =>
+            {
+                VoiceEvents.onPartialTranscription?.Invoke(transcription);
+            }, (response, final) =>
+            {
+
+            });
         }
 
         public void onError(string error, string message, string errorBody)

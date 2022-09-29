@@ -77,8 +77,8 @@ namespace Facebook.WitAi
         public const string URI_AUTHORITY = "api.wit.ai";
         public const int URI_DEFAULT_PORT = 0;
 
-        public const string WIT_API_VERSION = "20220222";
-        public const string WIT_SDK_VERSION = "0.0.38";
+        public const string WIT_API_VERSION = "20220608";
+        public const string WIT_SDK_VERSION = "0.0.44";
 
         public const string WIT_ENDPOINT_SPEECH = "speech";
         public const string WIT_ENDPOINT_MESSAGE = "message";
@@ -106,6 +106,7 @@ namespace Facebook.WitAi
 
         public byte[] postData;
         public string postContentType;
+        public string requestId = Guid.NewGuid().ToString();
 
         private object streamLock = new object();
 
@@ -113,9 +114,14 @@ namespace Facebook.WitAi
         private bool requestRequiresBody;
 
         /// <summary>
+        /// Callback called when a response is received from the server off a partial transcription
+        /// </summary>
+        public event Action<WitRequest> onPartialResponse;
+
+        /// <summary>
         /// Callback called when a response is received from the server
         /// </summary>
-        public Action<WitRequest> onResponse;
+        public event Action<WitRequest> onResponse;
 
         /// <summary>
         /// Callback called when the server is ready to receive data from the WitRequest's input
@@ -357,6 +363,8 @@ namespace Facebook.WitAi
                 _request.SendChunked = true;
             }
 
+            _request.Headers["X-Wit-Client-Request-Id"] = requestId;
+
             requestRequiresBody = RequestRequiresBody(command);
 
             var configId = "not-yet-configured";
@@ -375,7 +383,7 @@ namespace Facebook.WitAi
 
             _request.UserAgent = GetUserAgent(configuration);
 
-            requestStartTime = DateTime.UtcNow;
+            requestStartTime = DateTimeUtility.UtcNow;
             isActive = true;
             statusCode = 0;
             statusDescription = "Starting request";
@@ -462,7 +470,7 @@ namespace Facebook.WitAi
             }
 
             // Return full string
-            return $"voice-sdk-42.0.0.127.285,wit-unity-{WIT_SDK_VERSION},{_operatingSystem},{_deviceModel},{configId},{_appIdentifier},{userEditor},{_unityVersion}{customUserAgents}";
+            return $"voice-sdk-43.0.0.172.173,wit-unity-{WIT_SDK_VERSION},{_operatingSystem},{_deviceModel},{configId},{_appIdentifier},{userEditor},{_unityVersion}{customUserAgents}";
         }
 
         private bool RequestRequiresBody(string command)
@@ -486,7 +494,7 @@ namespace Facebook.WitAi
             var request = (IRequest)state;
             if (null != _request)
             {
-                Debug.Log("Request timed out after " + (DateTime.UtcNow - requestStartTime));
+                Debug.Log("Request timed out after " + (DateTimeUtility.UtcNow - requestStartTime));
                 request.Abort();
             }
 
@@ -504,6 +512,7 @@ namespace Facebook.WitAi
 
         private void HandleResponse(IAsyncResult ar)
         {
+            bool sentResponse = false;
             string stringResponse = "";
             responseStarted = true;
             try
@@ -532,7 +541,7 @@ namespace Facebook.WitAi
                                 {
                                     offset = 0;
                                     totalRead = 0;
-                                    ProcessStringResponse(stringResponse);
+                                    sentResponse |= ProcessStringResponse(stringResponse);
                                 }
                                 catch (JSONParseException e)
                                 {
@@ -550,12 +559,11 @@ namespace Facebook.WitAi
                         // result
                         if (!stringResponse.EndsWith("\r\n") && !string.IsNullOrEmpty(stringResponse))
                         {
-                            ProcessStringResponse(stringResponse);
+                            sentResponse |= ProcessStringResponse(stringResponse);
                         }
 
                         if (stringResponse.Length > 0 && null != responseData)
                         {
-                            MainThreadCallback(() => onFullTranscription?.Invoke(responseData["text"]));
                             MainThreadCallback(() => onRawResponse?.Invoke(stringResponse));
                         }
                     }
@@ -652,22 +660,55 @@ namespace Facebook.WitAi
                     stringResponse);
             }
 
-            SafeInvoke(onResponse);
-        }
-
-        private void ProcessStringResponse(string stringResponse)
-        {
-            responseData = WitResponseJson.Parse(stringResponse);
-            if (null != responseData)
+            // Send final response if have not yet
+            if (!sentResponse)
             {
-                var transcription = responseData["text"];
+                // Final transcription
+                string transcription = responseData.GetTranscription();
                 if (!string.IsNullOrEmpty(transcription))
+                {
+                    MainThreadCallback(() => onFullTranscription?.Invoke(transcription));
+                }
+                // Final response
+                SafeInvoke(onResponse);
+            }
+
+            // Complete
+            responseStarted = false;
+        }
+        // Safely handles
+        private bool ProcessStringResponse(string stringResponse)
+        {
+            // Decode full response
+            responseData = WitResponseJson.Parse(stringResponse);
+
+            // Handle responses
+            bool isFinal = responseData.HandleResponse((transcription, final) =>
+            {
+                // Call partial transcription
+                if (!final)
                 {
                     MainThreadCallback(() => onPartialTranscription?.Invoke(transcription));
                 }
-            }
-        }
+                // Call full transcription
+                else
+                {
+                    MainThreadCallback(() => onFullTranscription?.Invoke(transcription));
+                }
+            }, (response, final) =>
+            {
+                // Call partial response
+                SafeInvoke(onPartialResponse);
+                // Call final response
+                if (final)
+                {
+                    SafeInvoke(onResponse);
+                }
+            });
 
+            // Return final
+            return isFinal;
+        }
         private void HandleRequestStream(IAsyncResult ar)
         {
             try
@@ -710,12 +751,16 @@ namespace Facebook.WitAi
 
         private void SafeInvoke(Action<WitRequest> action)
         {
+            if (action == null)
+            {
+                return;
+            }
             MainThreadCallback(() =>
             {
                 // We want to allow each invocation to run even if there is an exception thrown by one
                 // of the callbacks in the invocation list. This protects shared invocations from
                 // clients blocking things like UI updates from other parts of the sdk being invoked.
-                foreach (var responseDelegate in action.GetInvocationList())
+                foreach (Action<WitRequest> responseDelegate in action.GetInvocationList())
                 {
                     try
                     {
@@ -814,7 +859,7 @@ namespace Facebook.WitAi
 
         #region CALLBACKS
         // Check performing
-        private bool _performing = false;
+        private CoroutineUtility.CoroutinePerformer _performer = null;
         // All actions
         private ConcurrentQueue<Action> _mainThreadCallbacks = new ConcurrentQueue<Action>();
         private Stream writeStream;
@@ -828,25 +873,30 @@ namespace Facebook.WitAi
         private void WatchMainThreadCallbacks()
         {
             // Ifnore if already performing
-            if (_performing)
+            if (_performer != null)
             {
                 return;
             }
 
             // Check callbacks every frame (editor or runtime)
-            CoroutineUtility.StartCoroutine(PerformMainThreadCallbacks());
+            _performer = CoroutineUtility.StartCoroutine(PerformMainThreadCallbacks());
         }
         // Every frame check for callbacks & perform any found
         private System.Collections.IEnumerator PerformMainThreadCallbacks()
         {
-            // Begin performing
-            _performing = true;
-
             // While checking, continue
             while (HasMainThreadCallbacks())
             {
                 // Wait for frame
-                yield return new WaitForEndOfFrame();
+                if (Application.isPlaying && !Application.isBatchMode)
+                {
+                    yield return new WaitForEndOfFrame();
+                }
+                // Wait for a tick
+                else
+                {
+                    yield return null;
+                }
 
                 // Perform if possible
                 while (_mainThreadCallbacks.Count > 0 && _mainThreadCallbacks.TryDequeue(out var result))
@@ -856,12 +906,12 @@ namespace Facebook.WitAi
             }
 
             // Done performing
-            _performing = false;
+            _performer = null;
         }
         // Check actions
         private bool HasMainThreadCallbacks()
         {
-            return IsActive || isRequestStreamActive || _mainThreadCallbacks.Count > 0;
+            return IsActive || isRequestStreamActive || HasResponseStarted || _mainThreadCallbacks.Count > 0;
         }
         #endregion
     }

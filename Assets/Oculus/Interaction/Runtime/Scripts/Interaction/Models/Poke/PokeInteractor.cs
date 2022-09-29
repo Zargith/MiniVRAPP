@@ -22,6 +22,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 using Oculus.Interaction.Surfaces;
+using System;
 using System.Linq;
 
 namespace Oculus.Interaction
@@ -38,6 +39,9 @@ namespace Oculus.Interaction
 
         [SerializeField]
         private float _touchReleaseThreshold = 0.002f;
+
+        [SerializeField]
+        private float _zThreshold = 0.001f;
 
         [SerializeField]
         private ProgressCurve _dragStartCurve;
@@ -157,7 +161,8 @@ namespace Oculus.Interaction
         private PokeInteractable ComputeSelectCandidate()
         {
             PokeInteractable closestInteractable = null;
-            float closestSqrDist = float.MaxValue;
+            float closestDistSqr = float.MaxValue;
+            float minNormalProject = float.MaxValue;
 
             IEnumerable<PokeInteractable> interactables = PokeInteractable.Registry.List(this);
 
@@ -201,10 +206,6 @@ namespace Oculus.Interaction
                     bool hit = interactable.Surface.Raycast(ray, out SurfaceHit surfaceHit);
                     if (hit && surfaceHit.Distance <= magnitude)
                     {
-                        // We collided against the surface and now we must rank this
-                        // interactable versus others that also pass this test this frame
-                        // but may be at a closer proximity. For this we use the closest
-                        // point compute against the surface intersection point
 
                         // Check if our collision lies outside of the optional volume mask
                         if (interactable.VolumeMask != null &&
@@ -213,18 +214,30 @@ namespace Oculus.Interaction
                             continue;
                         }
 
+                        // Check if our collision lies outside of the max distance in the proximityfield
                         Vector3 closestPointToHitPoint = interactable.ComputeClosestPoint(surfaceHit.Point);
-
                         float sqrDistanceFromPoint = (closestPointToHitPoint - surfaceHit.Point).sqrMagnitude;
-
                         if (sqrDistanceFromPoint > interactable.MaxDistance * interactable.MaxDistance)
                         {
                             continue;
                         }
 
-                        if (sqrDistanceFromPoint < closestSqrDist)
+                        // We collided against the surface and now we must rank this
+                        // interactable versus others that also pass this test this frame.
+
+                        // First we rank by normal distance traveled,
+                        // and secondly by closer proximity
+
+                        float normalProjection = Vector3.Dot(Origin - surfaceHit.Point, surfaceHit.Normal);
+
+                        // Either we're closer in normal distance, or, if within a zThreshold,
+                        // we use the closest point computed against the surface intersection point
+                        if (normalProjection < minNormalProject ||
+                            (Math.Abs(normalProjection - minNormalProject) < _zThreshold &&
+                             sqrDistanceFromPoint < closestDistSqr))
                         {
-                            closestSqrDist = sqrDistanceFromPoint;
+                            minNormalProject = normalProjection;
+                            closestDistSqr = sqrDistanceFromPoint;
                             closestInteractable = interactable;
                             ClosestPoint = closestPointToHitPoint;
                             TouchPoint = ClosestPoint;
@@ -479,6 +492,11 @@ namespace Oculus.Interaction
         public void InjectOptionalTouchReleaseThreshold(float touchReleaseThreshold)
         {
             _touchReleaseThreshold = touchReleaseThreshold;
+        }
+
+        public void InjectOptionalZThreshold(float zThreshold)
+        {
+            _zThreshold = zThreshold;
         }
 
         public void InjectOptionDragStartCurve(ProgressCurve dragStartCurve)

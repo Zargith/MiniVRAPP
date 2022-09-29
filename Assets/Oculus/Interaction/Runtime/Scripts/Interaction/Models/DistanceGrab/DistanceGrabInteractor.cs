@@ -181,7 +181,7 @@ namespace Oculus.Interaction
         }
 
         #region Inject
-        public void InjectAllGrabInteractor(ISelector selector, ConicalFrustum selectionFrustum)
+        public void InjectAllDistanceGrabInteractor(ISelector selector, ConicalFrustum selectionFrustum)
         {
             InjectSelector(selector);
             InjectSelectionFrustum(selectionFrustum);

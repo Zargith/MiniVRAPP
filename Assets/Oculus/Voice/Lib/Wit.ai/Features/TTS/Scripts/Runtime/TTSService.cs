@@ -37,11 +37,6 @@ namespace Facebook.WitAi.TTS
                         // Set as first instance that isn't a prefab
                         _instance = Array.Find(services, (o) => o.gameObject.scene.rootCount != 0);
                     }
-                    // Not found
-                    if (Application.isPlaying && _instance == null)
-                    {
-                        Debug.LogError("TTS Service - No Service found in scene");
-                    }
                 }
                 return _instance;
             }
@@ -644,9 +639,12 @@ namespace Facebook.WitAi.TTS
             // Add delegates if needed
             AddDelegates();
 
-            // Already in cache
+            // Check if cached to disk & log
             string downloadPath = DiskCacheHandler.GetDiskCachePath(clipData);
-            if (File.Exists(downloadPath))
+            bool found = DiskCacheHandler.IsCachedToDisk(clipData);
+
+            // Found
+            if (found)
             {
                 onDownloadComplete?.Invoke(clipData, downloadPath, string.Empty);
                 return;
