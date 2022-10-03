@@ -1953,7 +1953,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 117723012}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 1.5}
   m_LocalScale: {x: 0.015, y: 0.015, z: 0.015}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -13759,7 +13759,7 @@ PrefabInstance:
     - target: {fileID: 114392411909336904, guid: a9d2de84afb308a4796cc671d3432b4d,
         type: 3}
       propertyPath: _laserBeamBehavior
-      value: 2
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 120006741097097638, guid: a9d2de84afb308a4796cc671d3432b4d,
         type: 3}
@@ -13769,7 +13769,7 @@ PrefabInstance:
     - target: {fileID: 120006741097097638, guid: a9d2de84afb308a4796cc671d3432b4d,
         type: 3}
       propertyPath: m_Parameters.widthMultiplier
-      value: 0.1
+      value: 0.025
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_AddedGameObjects: []
@@ -50691,7 +50691,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7445426999302168893}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 2}
+  m_LocalPosition: {x: 0, y: 0, z: 1.5}
   m_LocalScale: {x: 0.015, y: 0.015, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -50787,7 +50787,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 920, y: 50}
+  m_SizeDelta: {x: 192, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &7082923991511025994
 GameObject:
@@ -52015,7 +52015,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 300, y: 0, z: 300, w: 0}
+  m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -52072,7 +52072,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 1920, y: 50}
+  m_SizeDelta: {x: 500, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &8017527872454403230
 GameObject:
