@@ -430,12 +430,14 @@ public class GameManager : MonoBehaviour
             sunlight.SetActive(false);
             nightPanel.SetActive(true);
             audioSource.clip = nightAmbiance;
+            audioSource.Play();
         } else {
             skybox.material = daySkybox;
             campfireFire.SetActive(false);
             sunlight.SetActive(true);
             nightPanel.SetActive(false);
             audioSource.clip = dayAmbiance;
+            audioSource.Play();
         }
     }
 }
