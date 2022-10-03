@@ -18,6 +18,7 @@ public class PlayerManager : InterfacePlayerManager
     public override void Die(string reason = "")
     {
         youDiedPanel.SetActive(true);
+        base.audioSource.Play();
         youDiedText.text = reason;
     }
 

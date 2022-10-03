@@ -7,6 +7,7 @@ public class OtherPlayerManager : InterfacePlayerManager
 {
     public override void Die(string reason = "")
     {
+        base.audioSource.Play();
         GetComponent<Rigidbody>().isKinematic = false;
         GetComponent<Animator>().enabled = false;
         GetComponentInChildren<TextMeshPro>().color = Color.red;

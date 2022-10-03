@@ -21,6 +21,7 @@ public class GameManager : MonoBehaviour
 
 
     [Header("UI")]
+    [SerializeField] AudioSource audioSource;
     [SerializeField] GameObject pauseMenu;
     [SerializeField] GameObject endGameMenu;
     [SerializeField] TextMeshProUGUI endGameText;
@@ -43,6 +44,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] GameObject campfireFire;
     [SerializeField] GameObject sunlight;
     [SerializeField] GameObject nightPanel;
+    [SerializeField] AudioClip dayAmbiance;
+    [SerializeField] AudioClip nightAmbiance;
     bool _dayNightCycle = true; // false = day, true = night
 
     public static GameManager Instance { get; private set; }
@@ -426,11 +429,13 @@ public class GameManager : MonoBehaviour
             campfireFire.SetActive(true);
             sunlight.SetActive(false);
             nightPanel.SetActive(true);
+            audioSource.clip = nightAmbiance;
         } else {
             skybox.material = daySkybox;
             campfireFire.SetActive(false);
             sunlight.SetActive(true);
             nightPanel.SetActive(false);
+            audioSource.clip = dayAmbiance;
         }
     }
 }
