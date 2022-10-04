@@ -174,6 +174,10 @@ public class OVRManager : MonoBehaviour, OVRMixedRealityCaptureConfiguration
 	/// Gets a reference to the active display.
 	/// </summary>
 	public static OVRDisplay display { get; private set; }
+	public void RecenterPose()
+	{
+		display.RecenterPose();
+	}
 
 	/// <summary>
 	/// Gets a reference to the active sensor.

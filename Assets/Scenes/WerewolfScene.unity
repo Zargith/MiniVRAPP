@@ -1006,6 +1006,7 @@ MonoBehaviour:
   - {fileID: 2003203407}
   - {fileID: 1553938987}
   playerTransform: {fileID: 7465239743503385889}
+  ovrManager: {fileID: 0}
   audioSource: {fileID: 1001625858}
   pauseMenu: {fileID: 8438285978827349965}
   endGameMenu: {fileID: 7750672736826153458}
@@ -3583,7 +3584,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ce6ab718d22d8741b1e87dfa1a3f979, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  target: {fileID: 0}
+  target: {fileID: 7465239743503385889}
 --- !u!114 &221471738
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5752,7 +5753,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ce6ab718d22d8741b1e87dfa1a3f979, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  target: {fileID: 0}
+  target: {fileID: 7465239743503385889}
 --- !u!114 &357060620
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6858,7 +6859,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ce6ab718d22d8741b1e87dfa1a3f979, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  target: {fileID: 0}
+  target: {fileID: 7465239743503385889}
 --- !u!114 &400012804
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7379,7 +7380,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ce6ab718d22d8741b1e87dfa1a3f979, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  target: {fileID: 0}
+  target: {fileID: 7465239743503385889}
 --- !u!114 &428273383
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8860,7 +8861,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ce6ab718d22d8741b1e87dfa1a3f979, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  target: {fileID: 0}
+  target: {fileID: 7465239743503385889}
 --- !u!114 &514817324
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -18031,7 +18032,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ce6ab718d22d8741b1e87dfa1a3f979, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  target: {fileID: 0}
+  target: {fileID: 7465239743503385889}
 --- !u!114 &1013358657
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -20764,7 +20765,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ce6ab718d22d8741b1e87dfa1a3f979, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  target: {fileID: 0}
+  target: {fileID: 7465239743503385889}
 --- !u!114 &1178690831
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -28581,7 +28582,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ce6ab718d22d8741b1e87dfa1a3f979, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  target: {fileID: 0}
+  target: {fileID: 7465239743503385889}
 --- !u!114 &1594967243
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -29932,7 +29933,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ce6ab718d22d8741b1e87dfa1a3f979, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  target: {fileID: 0}
+  target: {fileID: 7465239743503385889}
 --- !u!1001 &1662694502
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -31173,7 +31174,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ce6ab718d22d8741b1e87dfa1a3f979, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  target: {fileID: 0}
+  target: {fileID: 7465239743503385889}
 --- !u!114 &1733710948
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -34909,7 +34910,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ce6ab718d22d8741b1e87dfa1a3f979, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  target: {fileID: 0}
+  target: {fileID: 7465239743503385889}
 --- !u!114 &1905720959
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -35990,7 +35991,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ce6ab718d22d8741b1e87dfa1a3f979, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  target: {fileID: 0}
+  target: {fileID: 7465239743503385889}
 --- !u!114 &1943624366
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -36123,7 +36124,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ce6ab718d22d8741b1e87dfa1a3f979, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  target: {fileID: 0}
+  target: {fileID: 7465239743503385889}
 --- !u!114 &1943975156
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -39281,7 +39282,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ce6ab718d22d8741b1e87dfa1a3f979, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  target: {fileID: 0}
+  target: {fileID: 7465239743503385889}
 --- !u!114 &2142762924
 MonoBehaviour:
   m_ObjectHideFlags: 0

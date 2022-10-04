@@ -39,7 +39,7 @@
                 {
                     "name": "",
                     "id": "e9337a99-9031-4359-bcd3-1fec802ade6f",
-                    "path": "<XRController>{RightHand}/home",
+                    "path": "<XRController>{RightHand}/menu",
                     "interactions": "Hold",
                     "processors": "",
                     "groups": "",

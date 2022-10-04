@@ -20,7 +20,7 @@ public class GameManager : MonoBehaviour
     GameObject _eatenPlayer = null;
     [SerializeField] Transform playerTransform;
     Transform _playerDefaultTransform;
-
+    [SerializeField] OVRManager ovrManager;
 
     [Header("UI")]
     [SerializeField] AudioSource audioSource;
@@ -424,10 +424,13 @@ public class GameManager : MonoBehaviour
     [ContextMenu("Reset position")]
     public void ResetPosition()
     {
+        // UnityEngine.XR.InputTracking.Recenter();
+        // UnityEngine.XR.XRInputSubsystem.TryRecenter();
+        ovrManager.RecenterPose();
         // playerTransform.transform.position = _playerDefaultTransform.position;
         // playerTransform.transform.rotation = _playerDefaultTransform.rotation;
-        playerTransform.transform.Rotate(0, _playerDefaultTransform.rotation.eulerAngles.y - playerTransform.rotation.eulerAngles.y, 0);
-        playerTransform.transform.position += _playerDefaultTransform.position - playerTransform.position;
+        // playerTransform.transform.Rotate(0, _playerDefaultTransform.rotation.eulerAngles.y - playerTransform.rotation.eulerAngles.y, 0);
+        // playerTransform.transform.position += _playerDefaultTransform.position - playerTransform.position;
     }
 
 
