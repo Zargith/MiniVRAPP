@@ -18,6 +18,8 @@ public class GameManager : MonoBehaviour
     bool _waitingEndStep = true;
     bool _playerIsWereWolf = false;
     GameObject _eatenPlayer = null;
+    [SerializeField] Transform playerTransform;
+    Transform _playerDefaultTransform;
 
 
     [Header("UI")]
@@ -61,6 +63,10 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
+        _playerDefaultTransform = new GameObject().transform;
+        _playerDefaultTransform.position = playerTransform.position;
+        _playerDefaultTransform.rotation = playerTransform.rotation;
+
         for (int i = 0; i < roles.Count; i++)
             _availableRoles.Add(new Role(roles[i]));
 
@@ -374,7 +380,7 @@ public class GameManager : MonoBehaviour
     }
 
 #endregion
-#region Pause/Quit
+#region Pause/Quit/ResetPosition
 
     void changePauseState()
     {
@@ -408,6 +414,22 @@ public class GameManager : MonoBehaviour
         if (context.performed)
             changePauseState();
     }
+
+    public void ResetPositionButtonHolded(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+            ResetPosition();
+    }
+
+    [ContextMenu("Reset position")]
+    public void ResetPosition()
+    {
+        // playerTransform.transform.position = _playerDefaultTransform.position;
+        // playerTransform.transform.rotation = _playerDefaultTransform.rotation;
+        playerTransform.transform.Rotate(0, _playerDefaultTransform.rotation.eulerAngles.y - playerTransform.rotation.eulerAngles.y, 0);
+        playerTransform.transform.position += _playerDefaultTransform.position - playerTransform.position;
+    }
+
 
     public void QuitGame()
     {
