@@ -47,7 +47,7 @@
                 {
                     "name": "",
                     "id": "eeebaa9f-f56a-448e-9b00-f968a148c814",
-                    "path": "<XRController>{RightHand}/back",
+                    "path": "<XRController>{LeftHand}/start",
                     "interactions": "Hold",
                     "processors": "",
                     "groups": "",
