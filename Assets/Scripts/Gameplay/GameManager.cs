@@ -20,7 +20,7 @@ public class GameManager : MonoBehaviour
     GameObject _eatenPlayer = null;
     [SerializeField] Transform playerTransform;
     Transform _playerDefaultTransform;
-    // [SerializeField] OVRManager ovrManager;
+    [SerializeField] OVRManager ovrManager;
     [SerializeField] Camera playerMainCamera;
 
     [Header("UI")]
@@ -425,9 +425,10 @@ public class GameManager : MonoBehaviour
     [ContextMenu("Reset position")]
     public void ResetPosition()
     {
+        Debug.Log("button pressed");
         // UnityEngine.XR.InputTracking.Recenter();
         // UnityEngine.XR.XRInputSubsystem.TryRecenter();
-        // ovrManager.RecenterPose();
+        ovrManager.RecenterPose();
 
         // playerTransform.transform.position = _playerDefaultTransform.position;
         // playerTransform.transform.rotation = _playerDefaultTransform.rotation;
@@ -435,8 +436,8 @@ public class GameManager : MonoBehaviour
         // playerTransform.transform.Rotate(0, _playerDefaultTransform.rotation.eulerAngles.y - playerTransform.rotation.eulerAngles.y, 0);
         // playerTransform.transform.position += _playerDefaultTransform.position - playerTransform.position;
 
-        playerMainCamera.transform.Rotate(0, _playerDefaultTransform.rotation.eulerAngles.y - playerMainCamera.transform.rotation.eulerAngles.y, 0);
-        playerMainCamera.transform.position += _playerDefaultTransform.position - playerMainCamera.transform.position;
+        // playerMainCamera.transform.Rotate(0, _playerDefaultTransform.rotation.eulerAngles.y - playerMainCamera.transform.rotation.eulerAngles.y, 0);
+        // playerMainCamera.transform.position += _playerDefaultTransform.position - playerMainCamera.transform.position;
     }
 
 

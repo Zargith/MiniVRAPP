@@ -47,8 +47,8 @@
                 {
                     "name": "",
                     "id": "eeebaa9f-f56a-448e-9b00-f968a148c814",
-                    "path": "<XRSimulatedController>{RightHand}/gripButton",
-                    "interactions": "",
+                    "path": "<XRController>{RightHand}/back",
+                    "interactions": "Hold",
                     "processors": "",
                     "groups": "",
                     "action": "ResetPosition",
