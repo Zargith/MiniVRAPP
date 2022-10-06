@@ -1006,7 +1006,7 @@ MonoBehaviour:
   - {fileID: 2003203407}
   - {fileID: 1553938987}
   playerTransform: {fileID: 7465239743503385889}
-  ovrManager: {fileID: 0}
+  playerMainCamera: {fileID: 2807855828862362538}
   audioSource: {fileID: 1001625858}
   pauseMenu: {fileID: 8438285978827349965}
   endGameMenu: {fileID: 7750672736826153458}
@@ -44652,6 +44652,10 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+    m_ActionId: 5407167f-02ee-44a3-bd40-64d470ec0381
+    m_ActionName: Menu/MenuPress
+  - m_PersistentCalls:
+      m_Calls:
       - m_Target: {fileID: 70751912}
         m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
         m_MethodName: ResetPositionButtonHolded
@@ -44664,12 +44668,8 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-    m_ActionId: 5407167f-02ee-44a3-bd40-64d470ec0381
-    m_ActionName: Menu/MenuPress
-  - m_PersistentCalls:
-      m_Calls: []
-    m_ActionId: 44666360-2bf8-4d25-b9cd-f7cd58dd25c0
-    m_ActionName: Menu/New action
+    m_ActionId: cd0ebfa8-54a0-435f-b5b5-26d92ca70e80
+    m_ActionName: ResetPosition/ResetPosition
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Menu

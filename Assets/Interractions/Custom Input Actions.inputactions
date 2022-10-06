@@ -13,15 +13,6 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
-                },
-                {
-                    "name": "ResetPosition",
-                    "type": "Button",
-                    "id": "44666360-2bf8-4d25-b9cd-f7cd58dd25c0",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -35,12 +26,29 @@
                     "action": "MenuPress",
                     "isComposite": false,
                     "isPartOfComposite": false
-                },
+                }
+            ]
+        },
+        {
+            "name": "ResetPosition",
+            "id": "c01795f1-d0b6-4d4c-b087-0b17ee3ca55f",
+            "actions": [
+                {
+                    "name": "ResetPosition",
+                    "type": "Button",
+                    "id": "cd0ebfa8-54a0-435f-b5b5-26d92ca70e80",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
                 {
                     "name": "",
-                    "id": "e9337a99-9031-4359-bcd3-1fec802ade6f",
-                    "path": "<XRController>{RightHand}/menu",
-                    "interactions": "Hold",
+                    "id": "eeebaa9f-f56a-448e-9b00-f968a148c814",
+                    "path": "<XRSimulatedController>{RightHand}/gripButton",
+                    "interactions": "",
                     "processors": "",
                     "groups": "",
                     "action": "ResetPosition",
