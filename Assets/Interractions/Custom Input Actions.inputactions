@@ -28,34 +28,6 @@
                     "isPartOfComposite": false
                 }
             ]
-        },
-        {
-            "name": "ResetPosition",
-            "id": "c01795f1-d0b6-4d4c-b087-0b17ee3ca55f",
-            "actions": [
-                {
-                    "name": "ResetPosition",
-                    "type": "Button",
-                    "id": "cd0ebfa8-54a0-435f-b5b5-26d92ca70e80",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                }
-            ],
-            "bindings": [
-                {
-                    "name": "",
-                    "id": "eeebaa9f-f56a-448e-9b00-f968a148c814",
-                    "path": "<XRController>{LeftHand}/gripButton",
-                    "interactions": "Hold",
-                    "processors": "",
-                    "groups": "",
-                    "action": "ResetPosition",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                }
-            ]
         }
     ],
     "controlSchemes": []

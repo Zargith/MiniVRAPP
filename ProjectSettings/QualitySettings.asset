@@ -41,9 +41,7 @@ QualitySettings:
     asyncUploadPersistentBuffer: 1
     resolutionScalingFixedDPIFactor: 1
     customRenderPipeline: {fileID: 0}
-    excludedTargetPlatforms:
-    - Android
-    - Standalone
+    excludedTargetPlatforms: []
   - serializedVersion: 2
     name: Low
     pixelLightCount: 0
@@ -81,7 +79,6 @@ QualitySettings:
     customRenderPipeline: {fileID: 0}
     excludedTargetPlatforms:
     - Android
-    - Standalone
   - serializedVersion: 2
     name: Medium
     pixelLightCount: 1
@@ -206,7 +203,7 @@ QualitySettings:
     textureQuality: 0
     anisotropicTextures: 2
     antiAliasing: 4
-    softParticles: 1
+    softParticles: 0
     softVegetation: 1
     realtimeReflectionProbes: 1
     billboardsFaceCameraPosition: 1
