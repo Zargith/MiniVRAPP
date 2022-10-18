@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using TMPro;
 
+[RequireComponent(typeof(DayNighCycleManager))]
 public class GameManager : MonoBehaviour
 {
     [Header("Gameplay")]
@@ -17,11 +18,12 @@ public class GameManager : MonoBehaviour
     bool _firstTurn = true;
     bool _waitingEndStep = true;
     bool _playerIsWereWolf = false;
-    GameObject _eatenPlayer = null;
+    List<GameObject> _eatenPlayers = new List<GameObject>();
     [SerializeField] Transform playerTransform;
     Transform _playerDefaultTransform;
     [SerializeField] OVRManager ovrManager;
     [SerializeField] Camera playerMainCamera;
+
 
     [Header("UI")]
     [SerializeField] AudioSource audioSource;
@@ -38,18 +40,14 @@ public class GameManager : MonoBehaviour
     float _changeRate = 0;
     float _timeSoFar = 0;
     bool _fading = false;
+    [SerializeField] GameObject witchSavePanel;
+    [SerializeField] TextMeshProUGUI witchSaveText;
+    [SerializeField] GameObject witchUseKillPotionPanel;
 
 
     [Header("Day night cycle")]
-    [SerializeField] Material daySkybox;
-    [SerializeField] Material nightSkybox;
-    [SerializeField] Skybox skybox;
-    [SerializeField] GameObject campfireFire;
-    [SerializeField] GameObject sunlight;
-    [SerializeField] GameObject nightPanel;
-    [SerializeField] AudioClip dayAmbiance;
-    [SerializeField] AudioClip nightAmbiance;
-    bool _dayNightCycle = true; // false = day, true = night
+    DayNighCycleManager _dayNighCycleManager;
+
 
     public static GameManager Instance { get; private set; }
     private void Awake() 
@@ -64,6 +62,7 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
+        _dayNighCycleManager = GetComponent<DayNighCycleManager>();
         _playerDefaultTransform = new GameObject().transform;
         _playerDefaultTransform.position = playerTransform.position;
         _playerDefaultTransform.rotation = playerTransform.rotation;
@@ -85,6 +84,8 @@ public class GameManager : MonoBehaviour
         _playerIsWereWolf = _availableRoles[rInt]._name == "loup-garou";
         if (!_playerIsWereWolf)
             _nonWerewolfPlayers.Add(playerManager.gameObject);
+        if (_availableRoles[rInt].roleGameplayScriptName != "")
+            playerManager.gameObject.AddComponent(System.Type.GetType(_availableRoles[rInt].roleGameplayScriptName));
 
         _availableRoles[rInt].quantity--;
         if (_availableRoles[rInt].quantity == 0)
@@ -93,6 +94,9 @@ public class GameManager : MonoBehaviour
         for (int i = 0; i < otherPlayers.Count; i++) {
             rInt = Random.Range(0, _availableRoles.Count);
             otherPlayers[i].GetComponent<OtherPlayerManager>().SetRole(_availableRoles[rInt]);
+            if (_availableRoles[rInt].roleGameplayScriptName != "")
+                otherPlayers[i].gameObject.AddComponent(System.Type.GetType(_availableRoles[rInt].roleGameplayScriptName));
+
             if (_availableRoles[rInt]._name != "loup-garou")
                 _nonWerewolfPlayers.Add(otherPlayers[i]);
 
@@ -115,49 +119,62 @@ public class GameManager : MonoBehaviour
             switch (_gameCycleStep) {
                 case GameCycle.SetDay:
                     _waitingEndStep = true;
-                    changeDayNightCycle();
+                    _dayNighCycleManager.changeDayNightCycle(audioSource);
                     StartCoroutine(makeAnnouncement("Il fait jour, le village se réveille", true, true));
                     break;
 
                 case GameCycle.DeadsAnnouncement:
                     _waitingEndStep = true;
-                    if (_eatenPlayer.name == "Player") {
-                        StartCoroutine(makeAnnouncement("La nuit dernière vous avez été dévoré par les loups-garou..."));
-                        playerManager.Die("La nuit dernière vous avez été dévoré par les loups-garou...");
-                        _playerDied = true;
-                    } else {
-                        foreach (GameObject player in _alivePlayers)
-                            if (player.name == _eatenPlayer.name) {
-                                player.GetComponent<OtherPlayerManager>().Die();
-                                _alivePlayers.Remove(player);
-                                break;
-                            }
-                        StartCoroutine(makeAnnouncement($"La nuit dernière {_eatenPlayer.name} a été mangé(e) par les loups-garou\nIl/elle était {_eatenPlayer.GetComponent<OtherPlayerManager>().GetRole()._name}", true, true));
-                    }
+                    string deads = $"La nuit dernière {(_eatenPlayers.Count == 0 ? "personne n'a été mangé" : "{_eatenPlayers.Count} personne(s) a/ont été mangée(s) :\n")}";
+                    for (int i = 0; i < _eatenPlayers.Count; i++)
+                        if (_eatenPlayers[i].name == "Player") {
+                            StartCoroutine(makeAnnouncement("La nuit dernière vous avez été dévoré par les loups-garou..."));
+                            playerManager.Die("La nuit dernière vous avez été dévoré par les loups-garou...");
+                            _playerDied = true;
+                            return;
+                        } else {
+                            foreach (GameObject player in _alivePlayers)
+                                if (player.name == _eatenPlayers[i].name) {
+                                    deads += $"{_eatenPlayers[i].name} était {_eatenPlayers[i].GetComponent<OtherPlayerManager>().GetRole()._name}\n";
+                                    player.GetComponent<OtherPlayerManager>().Die();
+                                    _alivePlayers.Remove(player);
+                                    break;
+                                }
+                        }
+                        StartCoroutine(makeAnnouncement(deads, true, true));
+                        _eatenPlayers.Clear();
                     checkClassVictory();
-                    // TODO vérifier conditions de victoire et de mort du joueur mort
                     break;
 
                 case GameCycle.VillagersVote:
                     _waitingEndStep = true;
-                    // TODO ajouter (TODO en VR) le choix de la personne à éliminer
                     StartCoroutine(makeAnnouncement("Veuillez désigner une personne qui selon vous est un loup-garou", false, false, true));
                     break;
 
                 case GameCycle.SetNight:
                     _waitingEndStep = true;
-                    changeDayNightCycle();
+                    _dayNighCycleManager.changeDayNightCycle(audioSource);
                     StartCoroutine(makeAnnouncement("Le village s'endort", true, true));
                     break;
 
                 case GameCycle.WerewolvesVote:
                     _waitingEndStep = true;
-                    // TODO ajouter (TODO en VR) le choix de la personne à éliminer
                     if (_playerIsWereWolf) {
                         StartCoroutine(makeAnnouncement("Les loups-garous se réveillent pour aller manger un(e) villageois(e)\nQui désignez-vous ?", false, false, true));
-                        nightPanel.SetActive(false);
+                        _dayNighCycleManager.activateNightPanel(false);
                     } else
                         finishWerewolvesVote();
+                    break;
+
+                case GameCycle.WitchTurn:
+                    _waitingEndStep = true;
+                    // TODO ajouter (TODO en VR) le choix de la potion à utiliser
+                    if (playerManager.GetRole()._name == "sorcière") {
+                        StartCoroutine(makeAnnouncement($"La sorcière se réveille.\nCette nuit {_eatenPlayers[0].name} a été dévoré(e) par les loups-garou\nSouhaitez-vous utiliser votre potion de résurection ?", false, false, false, true));
+                        // avoir moyen de vérifier quelles potions ont été utilisées
+                        _dayNighCycleManager.activateNightPanel(false);
+                    } else
+                        finishWitchTurn();
                     break;
             }
     }
@@ -172,22 +189,25 @@ public class GameManager : MonoBehaviour
         setVisibleSelectButtons(false);
 
         assignNPCVotes();
-        _eatenPlayer = getEliminatedPlayer();
+        _eatenPlayers.Add(getEliminatedPlayer());
         resetSelectPlayers();
 
-        if (_eatenPlayer.name == "Player") {
+        if (_eatenPlayers[0].name == "Player") {
             StartCoroutine(makeAnnouncement("Les villageois ont voté pour vous éliminer"));
             playerManager.Die("Le village à voté contre vous...");
             _playerDied = true;
             return;
         } else {
-            StartCoroutine(makeAnnouncement($"Les villageois ont voté pour éliminer {_eatenPlayer.name}\nIl/elle était {_eatenPlayer.GetComponent<OtherPlayerManager>().GetRole()._name}", true, true));
+            StartCoroutine(makeAnnouncement($"Les villageois ont voté pour éliminer {_eatenPlayers[0].name}\nIl/elle était {_eatenPlayers[0].GetComponent<OtherPlayerManager>().GetRole()._name}", true, true));
             foreach (GameObject player in _alivePlayers)
-                if (player.name == _eatenPlayer.name) {
+                if (player.name == _eatenPlayers[0].name) {
                     player.GetComponent<OtherPlayerManager>().Die();
                     _alivePlayers.Remove(player);
+                    if (player.GetComponent<OtherPlayerManager>().GetRole()._name != "loup-garou")
+                        _nonWerewolfPlayers.Remove(player);
                     break;
                 }
+            _eatenPlayers.Clear();
         }
         checkClassVictory();
         // TODO vérifier conditions de victoire et de mort du joueur mort
@@ -196,18 +216,58 @@ public class GameManager : MonoBehaviour
     public void finishWerewolvesVote()
     {
         setVisibleSelectButtons(false);
-        nightPanel.SetActive(true);
+        _dayNighCycleManager.activateNightPanel(true);
 
         if (!_playerIsWereWolf)
             assignWerewolfVotes();
-        _eatenPlayer = getEliminatedPlayer();
+        _eatenPlayers.Add(getEliminatedPlayer());
         resetSelectPlayers();
 
         if (_playerIsWereWolf)
             StartCoroutine(makeAnnouncement("Les loups-garou se rendorment", true, true));
         else
             StartCoroutine(makeAnnouncement("Les loups-garous se sont réveillés pour dévorer un(e) villageois(e)", true, true));
-        nightPanel.SetActive(true);
+        _dayNighCycleManager.activateNightPanel(true);
+    }
+
+    public void witchSavePlayer(bool doSave)
+    {
+        if (doSave) {
+            _eatenPlayers.Clear();
+            playerManager.gameObject.GetComponent<WitchGameplay>().useSaveLifePotion();
+        }
+
+        StartCoroutine(makeAnnouncement("Souhaitez vous utiliser votre potion d'empoisonnement ?", false, false, false, false, true));
+    }
+
+    public void witchUseKillPotion(bool doUse)
+    {
+        setWitchSaveLivePanel(false);
+        if (doUse) {
+            setWitchKillPanel(false);
+        } else
+            finishWitchTurn();
+
+    }
+
+    public void witchKillPlayer(bool doKill)
+    {
+        setWitchUseKillPotionPanel(false);
+        if (doKill) {
+            _eatenPlayers.Add(playerManager.gameObject);
+            playerManager.gameObject.GetComponent<WitchGameplay>().useKillPotion();
+        }
+
+        finishWitchTurn();
+    }
+
+    public void finishWitchTurn()
+    {
+        // TODO : gérer la sorcière IA
+        setWitchKillPanel(false);
+        _eatenPlayers.Add(getEliminatedPlayer());
+        resetSelectPlayers();
+        StartCoroutine(makeAnnouncement("La sorcière se rendort", true, true));
     }
 
     int getRemainingPlayerWithRole(string roleName)
@@ -248,12 +308,13 @@ public class GameManager : MonoBehaviour
                 switch (condition.winConditionType) {
                     case (WinConditionType.All):
                         if (condition.winConditionStatus == WinConditionStatus.Dead && getRemainingPlayerWithRole(condition.roleName) == 0) {
-                            StartCoroutine(makeAnnouncement($"Les {role.namePlurial} ont gagné !"));
-                            setEndGame($"Les {role.namePlurial} ont gagné !");
-                        } else if (condition.winConditionStatus == WinConditionStatus.Dead && getRemainingPlayerWithRole("loup-garou") > getRemainingPlayerWithRole("villageois(e)")) {
-                            StartCoroutine(makeAnnouncement($"Les loups-garou ont gagné !"));
-                            setEndGame("Les loups-garou ont gagné !");
+                            StartCoroutine(makeAnnouncement($"La/le/les {role._name}/{role.namePlurial} a/ont gagné !"));
+                            setEndGame($"La/le/les {role._name}/{role.namePlurial} a/ont gagné !");
+                        } else if (condition.winConditionStatus == WinConditionStatus.Dead && getRemainingPlayerWithRole("loup-garou") > _nonWerewolfPlayers.Count) {
+                            StartCoroutine(makeAnnouncement($"La/le/les loup(s)-garou a/ont gagné !"));
+                            setEndGame("La/le/les loup(s)-garou a/ont gagné !");
                         }
+                        // faire vraie condition dynamique avec le not pour les loups-garou
                         break;
                 }
             }
@@ -294,6 +355,37 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    void setVisibleSomeSelectButtons(bool visible, List<GameObject> players)
+    {
+        foreach (GameObject player in players) {
+            Transform selectPlayerGO = player.transform.Find("Canvas/SelectPlayer");
+            if (selectPlayerGO != null)
+                selectPlayerGO.gameObject.SetActive(visible);
+        }
+    }
+
+    void setWitchSaveLivePanel(bool visible)
+    {
+        if (visible)
+            witchSaveText.text = $"{_eatenPlayers[0].name} va être éliminé(e) !\nVoulez-vous le/la sauver ?";
+        witchSavePanel.SetActive(visible);
+    }
+
+    void setWitchUseKillPotionPanel(bool visible)
+    {
+        witchUseKillPotionPanel.SetActive(visible);
+    }
+
+    void setWitchKillPanel(bool visible)
+    {
+        List<GameObject> selectablePlayers = new List<GameObject>(_alivePlayers);
+        selectablePlayers.Remove(_eatenPlayers[0]);
+        GameObject witch = selectablePlayers.Find(player => player.GetComponent<InterfacePlayerManager>().GetRole()._name == "sorcière");
+        if (witch)
+            selectablePlayers.Remove(witch);
+        setVisibleSomeSelectButtons(visible, selectablePlayers);
+    }
+
     void setEndGame(string reason = "")
     {
         _playerDied = true;
@@ -304,7 +396,7 @@ public class GameManager : MonoBehaviour
 #endregion
 #region Announcement
 
-    IEnumerator makeAnnouncement(string text, bool changeWaitingEndStep = false, bool updateCycleStep = false, bool displaySelection = false)
+    IEnumerator makeAnnouncement(string text, bool changeWaitingEndStep = false, bool updateCycleStep = false, bool displayPlayerSelection = false, bool displayWitchSaveSelection = false, bool displayWitchUseKillPotionSelection = false, bool displayKillSelection = false)
     {
         string[] texts = text.Split("\n");
 
@@ -320,7 +412,7 @@ public class GameManager : MonoBehaviour
         announceGO.SetActive(false);
 
         if (_firstTurn && !_playerIsWereWolf) {
-            nightPanel.SetActive(true);
+            _dayNighCycleManager.activateNightPanel(true);
             _firstTurn = false;
         }
 
@@ -334,8 +426,17 @@ public class GameManager : MonoBehaviour
         if (changeWaitingEndStep)
             _waitingEndStep = !_waitingEndStep;
 
-        if (displaySelection)
+        if (displayPlayerSelection)
             setVisibleSelectButtons(true);
+
+        if (displayWitchSaveSelection)
+            setWitchSaveLivePanel(true);
+
+        if (displayWitchUseKillPotionSelection)
+            setWitchUseKillPotionPanel(true);
+
+        if (displayKillSelection)
+            setWitchKillPanel(true);
     }
 
     public void FadeIn()
@@ -425,19 +526,7 @@ public class GameManager : MonoBehaviour
     [ContextMenu("Reset position")]
     public void ResetPosition()
     {
-        Debug.Log("button pressed");
-        // UnityEngine.XR.InputTracking.Recenter();
-        // UnityEngine.XR.XRInputSubsystem.TryRecenter();
         ovrManager.RecenterPose();
-
-        // playerTransform.transform.position = _playerDefaultTransform.position;
-        // playerTransform.transform.rotation = _playerDefaultTransform.rotation;
-
-        // playerTransform.transform.Rotate(0, _playerDefaultTransform.rotation.eulerAngles.y - playerTransform.rotation.eulerAngles.y, 0);
-        // playerTransform.transform.position += _playerDefaultTransform.position - playerTransform.position;
-
-        // playerMainCamera.transform.Rotate(0, _playerDefaultTransform.rotation.eulerAngles.y - playerMainCamera.transform.rotation.eulerAngles.y, 0);
-        // playerMainCamera.transform.localPosition += _playerDefaultTransform.localPosition - playerMainCamera.transform.localPosition;
     }
 
 
@@ -451,26 +540,5 @@ public class GameManager : MonoBehaviour
     }
 
 #endregion
-#region DayNightCycle
 
-    void changeDayNightCycle()
-    {
-        _dayNightCycle = !_dayNightCycle;
-        if (_dayNightCycle) {
-            skybox.material = nightSkybox;
-            campfireFire.SetActive(true);
-            sunlight.SetActive(false);
-            nightPanel.SetActive(true);
-            audioSource.clip = nightAmbiance;
-            audioSource.Play();
-        } else {
-            skybox.material = daySkybox;
-            campfireFire.SetActive(false);
-            sunlight.SetActive(true);
-            nightPanel.SetActive(false);
-            audioSource.clip = dayAmbiance;
-            audioSource.Play();
-        }
-    }
 }
-#endregion

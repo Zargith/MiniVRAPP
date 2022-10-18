@@ -10,20 +10,23 @@ public class Role : ScriptableObject
     public string description = "";
     public int quantity = 0;
     public WinCondition[] winConditions = new WinCondition[0];
+    public string roleGameplayScriptName = "";
 
     public Role(Role role) {
-        _name = role._name;
-        namePlurial = role.namePlurial;
-        description = role.description;
-        quantity = role.quantity;
-        winConditions = role.winConditions;
+        this._name = role._name;
+        this.namePlurial = role.namePlurial;
+        this.description = role.description;
+        this.quantity = role.quantity;
+        this.winConditions = role.winConditions;
+        this.roleGameplayScriptName = role.roleGameplayScriptName;
     }
 
-    public Role(string name, string namePlurial, string description, int quantity, WinCondition[] winConditions) {
+    public Role(string name, string namePlurial, string description, int quantity, WinCondition[] winConditions, string roleGameplayScriptName) {
         this._name = name;
         this.namePlurial = namePlurial;
         this.description = description;
         this.quantity = quantity;
         this.winConditions = winConditions;
+        this.roleGameplayScriptName = roleGameplayScriptName;
     }
 }

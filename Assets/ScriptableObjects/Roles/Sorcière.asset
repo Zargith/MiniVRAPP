@@ -10,11 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 45d906e8aaec0204d880d4bc126adc0d, type: 3}
-  m_Name: Villageois
+  m_Name: "Sorci\xE8re"
   m_EditorClassIdentifier: 
-  _name: villageois(e)
-  namePlurial: villageois(es)
+  _name: "sorci\xE8re"
+  namePlurial: "sorci\xE8res"
   description: 
-  quantity: 5
+  quantity: 1
   winConditions:
   - {fileID: 11400000, guid: ba278753f815f3e4e8cc8956acb96dc1, type: 2}
+  roleGameplayScriptName: WitchGameplay

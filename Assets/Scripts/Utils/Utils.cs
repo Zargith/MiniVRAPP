@@ -22,5 +22,6 @@ public enum GameCycle
     DeadsAnnouncement,
     VillagersVote,
     SetNight,
-    WerewolvesVote
+    WerewolvesVote,
+    WitchTurn
 }

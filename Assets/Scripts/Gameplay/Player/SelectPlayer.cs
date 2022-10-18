@@ -12,9 +12,10 @@ public class SelectPlayer : MonoBehaviour
         GameCycle gameCycle = GameManager.Instance.getGameCycleStep();
         if (gameCycle == GameCycle.VillagersVote)
             GameManager.Instance.finishVillagersVote();
-        else if (gameCycle == GameCycle.WerewolvesVote) {
+        else if (gameCycle == GameCycle.WerewolvesVote)
             GameManager.Instance.finishWerewolvesVote();
-        }
+        else if (gameCycle == GameCycle.WitchTurn)
+            GameManager.Instance.finishWitchTurn();
     }
 
     public void addVote()
