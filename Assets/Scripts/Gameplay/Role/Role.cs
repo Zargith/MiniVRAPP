@@ -10,7 +10,7 @@ public class Role : ScriptableObject
     public string description = "";
     public int quantity = 0;
     public WinCondition[] winConditions = new WinCondition[0];
-    public string roleGameplayScriptName = "";
+    public string roleGameplayScriptName = null;
 
     public Role(Role role) {
         this._name = role._name;
