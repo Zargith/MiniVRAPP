@@ -86,7 +86,7 @@ public class GameManager : MonoBehaviour
 		if (!_playerIsWereWolf)
 			_nonWerewolfPlayers.Add(playerManager.gameObject);
 
-		if (_availableRoles[rInt].roleGameplayScriptName == null || _availableRoles[rInt].roleGameplayScriptName != "")
+		if (_availableRoles[rInt].roleGameplayScriptName != null && _availableRoles[rInt].roleGameplayScriptName != "")
 			playerManager.gameObject.AddComponent(System.Type.GetType(_availableRoles[rInt].roleGameplayScriptName));
 
 		_availableRoles[rInt].quantity--;
@@ -97,7 +97,7 @@ public class GameManager : MonoBehaviour
 			rInt = Random.Range(0, _availableRoles.Count);
 			otherPlayers[i].GetComponent<OtherPlayerManager>().SetRole(_availableRoles[rInt]);
 
-			if (_availableRoles[rInt].roleGameplayScriptName == null || _availableRoles[rInt].roleGameplayScriptName != "")
+			if (_availableRoles[rInt].roleGameplayScriptName != null && _availableRoles[rInt].roleGameplayScriptName != "")
 				otherPlayers[i].gameObject.AddComponent(System.Type.GetType(_availableRoles[rInt].roleGameplayScriptName));
 
 			if (_availableRoles[rInt]._name != "loup-garou")
@@ -443,7 +443,7 @@ public class GameManager : MonoBehaviour
 		}
 
 		if (updateCycleStep) {
-			if (_gameCycleStep == GameCycle.WerewolvesVote)
+			if (_gameCycleStep == GameCycle.WitchTurn)
 				_gameCycleStep = GameCycle.SetDay;
 			else
 				_gameCycleStep++;
