@@ -192,7 +192,6 @@ public class GameManager : MonoBehaviour
 											selectablePlayers.RemoveAt(i);
 											break;
 										}
-									selectablePlayers.Remove(_eatenPlayers[0]);
 									int rInt = Random.Range(0, selectablePlayers.Count);
 									_eatenPlayers.Add(selectablePlayers[rInt]);
 									witchGameplay.useKillPotion();
