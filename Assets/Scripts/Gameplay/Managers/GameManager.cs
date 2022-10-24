@@ -188,7 +188,7 @@ public class GameManager : MonoBehaviour
 									List<GameObject> selectablePlayers = new List<GameObject>(_alivePlayers);
 									selectablePlayers.Remove(player);
 									for (int i = 0; i < selectablePlayers.Count; i++)
-										if (selectablePlayers[i] == _eatenPlayers[0]) {
+										if (_eatenPlayers.Count > 0 && selectablePlayers[i] == _eatenPlayers[0]) {
 											selectablePlayers.RemoveAt(i);
 											break;
 										}
@@ -263,14 +263,15 @@ public class GameManager : MonoBehaviour
 			playerManager.gameObject.GetComponent<WitchGameplay>().useSaveLifePotion();
 		}
 
+		setWitchSaveLivePanel(false);
 		StartCoroutine(makeAnnouncement("Souhaitez vous utiliser votre potion d'empoisonnement ?", false, false, false, false, true));
 	}
 
 	public void witchUseKillPotion(bool doUse)
 	{
-		setWitchSaveLivePanel(false);
+		setWitchKillPanel(false);
 		if (doUse) {
-			setWitchKillPanel(false);
+			playerManager.gameObject.GetComponent<WitchGameplay>().useKillPotion();
 		} else
 			finishWitchTurn();
 
@@ -405,7 +406,8 @@ public class GameManager : MonoBehaviour
 	void setWitchKillPanel(bool visible)
 	{
 		List<GameObject> selectablePlayers = new List<GameObject>(_alivePlayers);
-		selectablePlayers.Remove(_eatenPlayers[0]);
+		if (_eatenPlayers.Count > 0)
+			selectablePlayers.Remove(_eatenPlayers[0]);
 		GameObject witch = selectablePlayers.Find(player => player.GetComponent<InterfacePlayerManager>().GetRole()._name == "sorcière");
 		if (witch)
 			selectablePlayers.Remove(witch);
