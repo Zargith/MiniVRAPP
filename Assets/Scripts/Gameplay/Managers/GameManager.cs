@@ -271,10 +271,10 @@ public class GameManager : MonoBehaviour
 	{
 		setWitchKillPanel(false);
 		if (doUse) {
-			playerManager.gameObject.GetComponent<WitchGameplay>().useKillPotion();
+			setWitchUseKillPotionPanel(false);
+			setWitchKillPanel(true);
 		} else
 			finishWitchTurn();
-
 	}
 
 	public void witchKillPlayer(bool doKill)
