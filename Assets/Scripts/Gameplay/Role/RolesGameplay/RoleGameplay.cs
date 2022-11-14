@@ -5,8 +5,5 @@ using UnityEngine;
 [System.Serializable]
 public class RoleGameplay : MonoBehaviour
 {
-    void Start()
-    {
-        
-    }
+    void Start() {}
 }

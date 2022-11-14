@@ -5,6 +5,8 @@ using UnityEngine;
 [System.Serializable]
 public class WitchGameplay : RoleGameplay
 {
+    void Start() {}
+
     bool _potionSavedLife = false;
     bool _potionKilled = false;
 
