@@ -176,17 +176,17 @@ public class GameManager : MonoBehaviour
 						StartCoroutine(makeAnnouncement($"La sorcière se réveille.\nCette nuit {_eatenPlayers[0].name} a été dévoré(e) par les loups-garou\nSouhaitez-vous utiliser votre potion de résurrection ?", false, false, false, true));
 						_dayNighCycleManager.activateNightPanel(false);
 					} else {
-						StartCoroutine(makeAnnouncement($"La sorcière se réveille."));
+						StartCoroutine(makeAnnouncement($"La sorcière se réveille"));
 						foreach (GameObject player in _alivePlayers) {
 							WitchGameplay witchGameplay;
 							player.TryGetComponent<WitchGameplay>(out witchGameplay);
-							if (witchGameplay != null) {
+							if (witchGameplay != null && Random.Range(0, 2) == 0) {
 								if (!witchGameplay.potionSavedLife()) {
 									_eatenPlayers.Clear();
 									witchGameplay.useSaveLifePotion();
 								}
 
-								if (!witchGameplay.potionKilled()) {
+								if (!witchGameplay.potionKilled()  && Random.Range(0, 2) == 0) {
 									List<GameObject> selectablePlayers = new List<GameObject>(_alivePlayers);
 									selectablePlayers.Remove(player);
 									for (int i = 0; i < selectablePlayers.Count; i++)
@@ -234,7 +234,6 @@ public class GameManager : MonoBehaviour
 			_eatenPlayers.Clear();
 		}
 		checkClassVictory();
-		// TODO vérifier conditions de victoire et de mort du joueur mort
 	}
 
 	public void finishWerewolvesVote()
@@ -252,6 +251,7 @@ public class GameManager : MonoBehaviour
 		else
 			StartCoroutine(makeAnnouncement("Les loups-garous se sont réveillés pour dévorer un(e) villageois(e)", true, true));
 		_dayNighCycleManager.activateNightPanel(true);
+		Debug.Log("finishWerewolvesVote");
 	}
 
 	public void witchSavePlayer(bool doSave)
