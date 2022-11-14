@@ -143,11 +143,7 @@ public class GameManager : MonoBehaviour
 									break;
 								}
 						}
-					StartCoroutine(makeAnnouncement(deads));
-					_eatenPlayers.Clear();
-					checkClassVictory();
-					_waitingEndStep = false;
-					_gameCycleStep++;
+					StartCoroutine(makeAnnouncement(deads, false, false, false, false, false, false, true));
 					break;
 
 				case GameCycle.VillagersVote:
@@ -225,13 +221,13 @@ public class GameManager : MonoBehaviour
 			_playerDied = true;
 			return;
 		} else {
-			StartCoroutine(makeAnnouncement($"Les villageois ont voté pour éliminer {_eatenPlayers[0].name}\nIl/elle était {_eatenPlayers[0].GetComponent<OtherPlayerManager>().GetRole()._name}", true, true));
 			foreach (GameObject player in _alivePlayers)
 				if (player.name == _eatenPlayers[0].name) {
 					setPlayerToEliminated(player);
 					break;
 				}
-			_eatenPlayers.Clear();
+			StartCoroutine(makeAnnouncement($"Les villageois ont voté pour éliminer {_eatenPlayers[0].name}\nIl/elle était {_eatenPlayers[0].GetComponent<OtherPlayerManager>().GetRole()._name}", true, true, false, false, false, false, true));
+			// _eatenPlayers.Clear();
 		}
 		checkClassVictory();
 	}
@@ -251,7 +247,6 @@ public class GameManager : MonoBehaviour
 		else
 			StartCoroutine(makeAnnouncement("Les loups-garous se sont réveillés pour dévorer un(e) villageois(e)", true, true));
 		_dayNighCycleManager.activateNightPanel(true);
-		Debug.Log("finishWerewolvesVote");
 	}
 
 	public void witchSavePlayer(bool doSave)
@@ -430,7 +425,7 @@ public class GameManager : MonoBehaviour
 	#endregion
 	#region Announcement
 
-	IEnumerator makeAnnouncement(string text, bool changeWaitingEndStep = false, bool updateCycleStep = false, bool displayPlayerSelection = false, bool displayWitchSaveSelection = false, bool displayWitchUseKillPotionSelection = false, bool displayKillSelection = false)
+	IEnumerator makeAnnouncement(string text, bool changeWaitingEndStep = false, bool updateCycleStep = false, bool displayPlayerSelection = false, bool displayWitchSaveSelection = false, bool displayWitchUseKillPotionSelection = false, bool displayKillSelection = false, bool cleanEatenPlayers = false)
 	{
 		string[] texts = text.Split("\n");
 
@@ -456,6 +451,9 @@ public class GameManager : MonoBehaviour
 			else
 				_gameCycleStep++;
 		}
+
+		if (cleanEatenPlayers)
+			_eatenPlayers.Clear();
 
 		if (changeWaitingEndStep)
 			_waitingEndStep = !_waitingEndStep;
