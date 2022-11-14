@@ -144,6 +144,7 @@ public class GameManager : MonoBehaviour
 								}
 						}
 					StartCoroutine(makeAnnouncement(deads, true, true, false, false, false, false, true));
+					checkClassVictory();
 					break;
 
 				case GameCycle.VillagersVote:
@@ -169,7 +170,8 @@ public class GameManager : MonoBehaviour
 				case GameCycle.WitchTurn:
 					_waitingEndStep = true;
 					if (playerManager.GetRole()._name == "sorcière") {
-						StartCoroutine(makeAnnouncement($"La sorcière se réveille.\nCette nuit {_eatenPlayers[0].name} a été dévoré(e) par les loups-garou\nSouhaitez-vous utiliser votre potion de résurrection ?", false, false, false, true));
+						string eatenPlayer = _eatenPlayers[0].name == "Player" ? "vous avez" : $"{_eatenPlayers[0].name} a";
+						StartCoroutine(makeAnnouncement($"La sorcière se réveille.\nCette nuit {_eatenPlayers[0].name} été dévoré(e) par les loups-garou\nSouhaitez-vous utiliser votre potion de résurrection ?", false, false, false, true));
 						_dayNighCycleManager.activateNightPanel(false);
 					} else {
 						foreach (GameObject player in _alivePlayers) {
@@ -334,16 +336,24 @@ public class GameManager : MonoBehaviour
 	void checkClassVictory()
 	{
 		foreach (Role role in roles) {
+			if (getRemainingPlayerWithRole(role._name) == _alivePlayers.Count) {
+				StartCoroutine(makeAnnouncement($"La/le/les {role._name}/{role.namePlurial} a/ont gagné !"));
+				setEndGame($"La/le/les {role._name}/{role.namePlurial} a/ont gagné !");
+				return;
+			}
+
 			WinCondition[] winConditions = role.winConditions;
 			foreach (WinCondition condition in winConditions) {
 				switch (condition.winConditionType) {
 					case ( WinConditionType.All ):
-						if ((condition.winConditionStatus == WinConditionStatus.Dead && getRemainingPlayerWithRole(condition.roleName) == 0)  || getRemainingPlayerWithRole(role._name) == _alivePlayers.Count) {
+						if (condition.winConditionStatus == WinConditionStatus.Dead && getRemainingPlayerWithRole(condition.roleName) == 0) {
 							StartCoroutine(makeAnnouncement($"La/le/les {role._name}/{role.namePlurial} a/ont gagné !"));
 							setEndGame($"La/le/les {role._name}/{role.namePlurial} a/ont gagné !");
+							return;
 						} else if (condition.winConditionStatus == WinConditionStatus.Dead && getRemainingPlayerWithRole("loup-garou") > _nonWerewolfPlayers.Count) {
 							StartCoroutine(makeAnnouncement($"La/le/les loup(s)-garou a/ont gagné !"));
 							setEndGame("La/le/les loup(s)-garou a/ont gagné !");
+							return;
 						}
 						break;
 				}
