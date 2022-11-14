@@ -277,10 +277,8 @@ public class GameManager : MonoBehaviour
 	public void witchKillPlayer(bool doKill)
 	{
 		setWitchUseKillPotionPanel(false);
-		if (doKill) {
-			_eatenPlayers.Add(playerManager.gameObject);
+		if (doKill)
 			playerManager.gameObject.GetComponent<WitchGameplay>().useKillPotion();
-		}
 
 		finishWitchTurn();
 	}
@@ -301,7 +299,7 @@ public class GameManager : MonoBehaviour
 			_gameCycleStep = GameCycle.SetDay;
 		else
 			_gameCycleStep++;
-		_waitingEndStep = !_waitingEndStep;
+		_waitingEndStep = false;
 	}
 
 	int getRemainingPlayerWithRole(string roleName)
@@ -366,7 +364,7 @@ public class GameManager : MonoBehaviour
 	{
 		GameObject eliminatedPlayer = null;
 		foreach (GameObject player in _alivePlayers) {
-			if (!eliminatedPlayer)
+			if (!eliminatedPlayer && player.GetComponent<SelectPlayer>().get() > 0)
 				eliminatedPlayer = player;
 			else if (player.GetComponentInChildren<SelectPlayer>().get() > eliminatedPlayer.GetComponentInChildren<SelectPlayer>().get())
 				eliminatedPlayer = player;
