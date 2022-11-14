@@ -331,7 +331,6 @@ public class GameManager : MonoBehaviour
 			foreach (WinCondition condition in winConditions) {
 				switch (condition.winConditionType) {
 					case ( WinConditionType.All ):
-						Debug.Log(_nonWerewolfPlayers.Count);
 						if (condition.winConditionStatus == WinConditionStatus.Dead && getRemainingPlayerWithRole(condition.roleName) == 0) {
 							StartCoroutine(makeAnnouncement($"La/le/les {role._name}/{role.namePlurial} a/ont gagné !"));
 							setEndGame($"La/le/les {role._name}/{role.namePlurial} a/ont gagné !");
@@ -339,7 +338,7 @@ public class GameManager : MonoBehaviour
 							StartCoroutine(makeAnnouncement($"La/le/les loup(s)-garou a/ont gagné !"));
 							setEndGame("La/le/les loup(s)-garou a/ont gagné !");
 						} else
-							Debug.Log(condition);
+							Debug.Log(condition.ToString());
 						// faire vraie condition dynamique avec le not pour les loups-garou
 						break;
 				}
