@@ -97,8 +97,8 @@ public class GameManager : MonoBehaviour
 			rInt = Random.Range(0, _availableRoles.Count);
 			otherPlayers[i].GetComponent<OtherPlayerManager>().SetRole(_availableRoles[rInt]);
 
-			if (_availableRoles[rInt].roleGameplayScriptName != null && _availableRoles[rInt].roleGameplayScriptName != "")
-				otherPlayers[i].gameObject.AddComponent(System.Type.GetType(_availableRoles[rInt].roleGameplayScriptName));
+			// if (_availableRoles[rInt].roleGameplayScriptName != null && _availableRoles[rInt].roleGameplayScriptName != "")
+			// 	otherPlayers[i].gameObject.AddComponent(System.Type.GetType(_availableRoles[rInt].roleGameplayScriptName));
 
 			if (_availableRoles[rInt]._name != "loup-garou")
 				_nonWerewolfPlayers.Add(otherPlayers[i]);
@@ -127,7 +127,7 @@ public class GameManager : MonoBehaviour
 
 				case GameCycle.DeadsAnnouncement:
 					_waitingEndStep = true;
-					string eatenPlayers = ( _eatenPlayers.Count == 0 ? "personne n'a été mangé" : $"{_eatenPlayers.Count} personne(s) a/ont été mangée(s) :\n" );
+					string eatenPlayers = _eatenPlayers.Count == 0 ? "personne n'a été mangé" : $"{_eatenPlayers.Count} personne(s) a/ont été mangée(s) :\n";
 					string deads = $"La nuit dernière {eatenPlayers}";
 					for (int i = 0; i < _eatenPlayers.Count; i++)
 						if (_eatenPlayers[i].name == "Player") {
@@ -175,6 +175,9 @@ public class GameManager : MonoBehaviour
 						_dayNighCycleManager.activateNightPanel(false);
 					} else {
 						foreach (GameObject player in _alivePlayers) {
+							if (player.GetComponent<InterfacePlayerManager>().GetRole()._name != "sorcière")
+								break;
+
 							WitchGameplay witchGameplay;
 							player.TryGetComponent<WitchGameplay>(out witchGameplay);
 							if (witchGameplay != null) {
@@ -183,7 +186,7 @@ public class GameManager : MonoBehaviour
 									witchGameplay.useSaveLifePotion();
 								}
 
-								if (!witchGameplay.potionKilled()  && Random.Range(0, 2) == 0) {
+								if (!witchGameplay.potionKilled() && Random.Range(0, 2) == 0) {
 									List<GameObject> selectablePlayers = new List<GameObject>(_alivePlayers);
 									selectablePlayers.Remove(player);
 									for (int i = 0; i < selectablePlayers.Count; i++)
@@ -227,7 +230,7 @@ public class GameManager : MonoBehaviour
 					setPlayerToEliminated(player);
 					break;
 				}
-			StartCoroutine(makeAnnouncement($"Les villageois ont voté pour éliminer {_eatenPlayers[0].name}\nIl/elle était {_eatenPlayers[0].GetComponent<OtherPlayerManager>().GetRole()._name}", true, true, false, false, false, false, true));
+			StartCoroutine(makeAnnouncement($"Le village a voté pour éliminer {_eatenPlayers[0].name}\nIl/elle était {_eatenPlayers[0].GetComponent<OtherPlayerManager>().GetRole()._name}", true, true, false, false, false, false, true));
 			// _eatenPlayers.Clear();
 		}
 		checkClassVictory();
@@ -289,9 +292,7 @@ public class GameManager : MonoBehaviour
 		if (eliminatedPlayer)
 			_eatenPlayers.Add(eliminatedPlayer);
 		resetSelectPlayers();
-		foreach (GameObject player in _alivePlayers) {
-			WitchGameplay witchGameplay;
-			player.TryGetComponent<WitchGameplay>(out witchGameplay);
+		if (_alivePlayers.Find(player => player.GetComponent<InterfacePlayerManager>().GetRole()._name == "sorcière")) {
 			StartCoroutine(makeAnnouncement("La sorcière se rendort", true, true));
 			return;
 		}
@@ -381,9 +382,9 @@ public class GameManager : MonoBehaviour
 
 	void setPlayerToEliminated(GameObject player)
 	{
-		player.GetComponent<OtherPlayerManager>().Die();
+		player.GetComponent<InterfacePlayerManager>().Die();
 		_alivePlayers.Remove(player);
-		if (player.GetComponent<OtherPlayerManager>().GetRole()._name != "loup-garou")
+		if (player.GetComponent<InterfacePlayerManager>().GetRole()._name != "loup-garou")
 			_nonWerewolfPlayers.Remove(player);
 	}
 
@@ -415,7 +416,7 @@ public class GameManager : MonoBehaviour
 	void setWitchSaveLivePanel(bool visible)
 	{
 		if (visible)
-			witchSaveText.text = $"{_eatenPlayers[0].name} va être éliminé(e) !\nVoulez-vous le/la sauver ?";
+			witchSaveText.text = _eatenPlayers[0].name == "Player" ? "Vous allez être éliminé(e) !\nVoulez-vous vous sauver ?" : $"{_eatenPlayers[0].name} va être éliminé(e) !\nVoulez-vous le/la sauver ?";
 		witchSavePanel.SetActive(visible);
 	}
 
