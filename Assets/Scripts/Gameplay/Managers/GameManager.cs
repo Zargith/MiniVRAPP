@@ -143,7 +143,7 @@ public class GameManager : MonoBehaviour
 									break;
 								}
 						}
-					StartCoroutine(makeAnnouncement(deads, false, false, false, false, false, false, true));
+					StartCoroutine(makeAnnouncement(deads, true, true, false, false, false, false, true));
 					break;
 
 				case GameCycle.VillagersVote:
@@ -263,10 +263,10 @@ public class GameManager : MonoBehaviour
 	public void witchUseKillPotion(bool doUse)
 	{
 		setWitchKillPanel(false);
-		if (doUse) {
-			setWitchUseKillPotionPanel(false);
+		setWitchUseKillPotionPanel(false);
+		if (doUse)
 			setWitchKillPanel(true);
-		} else
+		else
 			finishWitchTurn();
 	}
 
