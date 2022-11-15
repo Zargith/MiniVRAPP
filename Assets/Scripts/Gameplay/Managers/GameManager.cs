@@ -24,6 +24,9 @@ public class GameManager : MonoBehaviour
 	[SerializeField] OVRManager ovrManager;
 	[SerializeField] Camera playerMainCamera;
 
+	[Header("WitchGameplay")]
+	bool _witchCanUseResurrectPotion = true;
+	bool _witchCanUsePoisonPotion = true;
 
 	[Header("UI")]
 	[SerializeField] AudioSource audioSource;
@@ -171,7 +174,12 @@ public class GameManager : MonoBehaviour
 					_waitingEndStep = true;
 					if (playerManager.GetRole()._name == "sorcière") {
 						string eatenPlayer = _eatenPlayers[0].name == "Player" ? "vous avez" : $"{_eatenPlayers[0].name} a";
-						StartCoroutine(makeAnnouncement($"La sorcière se réveille.\nCette nuit {_eatenPlayers[0].name} été dévoré(e) par les loups-garou\nSouhaitez-vous utiliser votre potion de résurrection ?", false, false, false, true));
+						if (_witchCanUseResurrectPotion)
+							StartCoroutine(makeAnnouncement($"La sorcière se réveille.\nCette nuit {eatenPlayer} été dévoré(e) par les loups-garou\nSouhaitez-vous utiliser votre potion de résurrection ?", false, false, false, true));
+						else if (_witchCanUsePoisonPotion)
+							StartCoroutine(makeAnnouncement($"La sorcière se réveille.\nCette nuit {eatenPlayer} été dévoré(e) par les loups-garou\nVous n'avez plus de potion de résurrection...", false, false, false, false, true));
+						else
+							StartCoroutine(makeAnnouncement($"Vous n'avez plus de potions. Vous dormez paisiblement", true, true));
 						_dayNighCycleManager.activateNightPanel(false);
 					} else {
 						foreach (GameObject player in _alivePlayers) {
@@ -181,12 +189,14 @@ public class GameManager : MonoBehaviour
 							WitchGameplay witchGameplay;
 							player.TryGetComponent<WitchGameplay>(out witchGameplay);
 							if (witchGameplay != null) {
-								if (!witchGameplay.potionSavedLife() && Random.Range(0, 2) == 0) {
+								// if (!witchGameplay.potionSavedLife() && Random.Range(0, 2) == 0) {
+								if (_witchCanUseResurrectPotion && Random.Range(0, 2) == 0) {
 									_eatenPlayers.Clear();
-									witchGameplay.useSaveLifePotion();
+									_witchCanUseResurrectPotion = false;
 								}
 
-								if (!witchGameplay.potionKilled() && Random.Range(0, 2) == 0) {
+								// if (!witchGameplay.potionKilled() && Random.Range(0, 2) == 0) {
+								if (_witchCanUsePoisonPotion && Random.Range(0, 2) == 0) {
 									List<GameObject> selectablePlayers = new List<GameObject>(_alivePlayers);
 									selectablePlayers.Remove(player);
 									for (int i = 0; i < selectablePlayers.Count; i++)
@@ -196,7 +206,7 @@ public class GameManager : MonoBehaviour
 										}
 									int rInt = Random.Range(0, selectablePlayers.Count);
 									_eatenPlayers.Add(selectablePlayers[rInt]);
-									witchGameplay.useKillPotion();
+									_witchCanUsePoisonPotion = false;
 								}
 							}
 						}
@@ -255,9 +265,9 @@ public class GameManager : MonoBehaviour
 
 	public void witchSavePlayer(bool doSave)
 	{
-		if (doSave) {
+		if (doSave && _witchCanUseResurrectPotion) {
 			_eatenPlayers.Clear();
-			playerManager.gameObject.GetComponent<WitchGameplay>().useSaveLifePotion();
+			_witchCanUseResurrectPotion = false;
 		}
 
 		setWitchSaveLivePanel(false);
@@ -268,7 +278,7 @@ public class GameManager : MonoBehaviour
 	{
 		setWitchKillPanel(false);
 		setWitchUseKillPotionPanel(false);
-		if (doUse)
+		if (doUse && _witchCanUsePoisonPotion)
 			setWitchKillPanel(true);
 		else
 			finishWitchTurn();
@@ -277,8 +287,8 @@ public class GameManager : MonoBehaviour
 	public void witchKillPlayer(bool doKill)
 	{
 		setWitchUseKillPotionPanel(false);
-		if (doKill)
-			playerManager.gameObject.GetComponent<WitchGameplay>().useKillPotion();
+		if (doKill && _witchCanUsePoisonPotion)
+			_witchCanUsePoisonPotion = false;
 
 		finishWitchTurn();
 	}
