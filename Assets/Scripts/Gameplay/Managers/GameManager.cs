@@ -376,7 +376,7 @@ public class GameManager : MonoBehaviour
 		foreach (GameObject player in _alivePlayers) {
 			if (!eliminatedPlayer && player.GetComponent<SelectPlayer>().get() > 0)
 				eliminatedPlayer = player;
-			else if (player.GetComponentInChildren<SelectPlayer>().get() > eliminatedPlayer.GetComponentInChildren<SelectPlayer>().get())
+			else if (eliminatedPlayer && player.GetComponentInChildren<SelectPlayer>().get() > eliminatedPlayer.GetComponentInChildren<SelectPlayer>().get())
 				eliminatedPlayer = player;
 		}
 		return eliminatedPlayer;
